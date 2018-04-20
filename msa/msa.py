@@ -1,8 +1,25 @@
 import os, sys, re
-import ConfigParser
 import optparse
 import subprocess
 
+
+#-------------#
+# Config      #
+#-------------#
+account = None
+cluster_name = "hydra.prib.upf.edu"
+memory = "512Gb"
+platform = "slurm"
+processors = 32
+queue = None
+user_email = "oriol@cmmt.ubc.ca"
+walltime = "168:00:00"
+# e.g. conda install -c bioconda clustalo
+clustalo_path = "/home/ofornes/.anaconda2.7/bin"
+# e.g. conda install -c bioconda mmseqs2
+mmseqs_path = "/home/ofornes/.anaconda2.7/bin"
+# i.e. dir where uniref.sh was exec
+uniref_path = "/home/ofornes/scratch/RADI/uniref"
 
 #-------------#
 # Parsers     #
@@ -23,12 +40,8 @@ def parse_file(file_name):
         # Initialize #
         f = None
         # Open file handle #
-        if gz:
-            try: f = gzip.open(file_name, "rt")
-            except: raise ValueError("Could not open file %s" % file_name)
-        else:
-            try: f = open(file_name, "rt")
-            except: raise ValueError("Could not open file %s" % file_name)
+        try: f = open(file_name, "rt")
+        except: raise ValueError("Could not open file %s" % file_name)
         # For each line... #
         for line in f:
             yield line.strip("\n")
@@ -53,7 +66,7 @@ def parse_fasta_file(file_name, clean=True):
     header = ""
     sequence = ""
     # For each line... #
-    for line in parse_file(file_name, gz):
+    for line in parse_file(file_name):
         if len(line) == 0: continue
         if line.startswith("#"): continue
         if line.startswith(">"):
@@ -75,7 +88,7 @@ def parse_fasta_file(file_name, clean=True):
 # Write       #
 #-------------#
 
-def write(file_name=None, content=None):
+def write(file_name=None, content=""):
     """
     This function writes any {content} to a file or to stdout if no
     file is provided. If the file already exists, it pushed the {content}
@@ -112,7 +125,7 @@ def parse_options():
     parser.add_option("-i", action="store", type="string", dest="input_file", help="Input file (in FASTA format)", metavar="<input_file>")
     parser.add_option("-j", action="store", default=8, type="int", dest="max_iterations", help="Max. number of iterations (default=8)", metavar="<max_iterations>")
     parser.add_option("-n", action="store", default="uniref50", type="string", dest="nr_db", help="Non-redundant database (\"uniref50\", \"uniref90\" or \"uniref100\"; default=uniref50)", metavar="<nr_db>")
-    parser.add_option("-o", action="store", default="./", type="string", dest="output_file", help="Output directory (default = ./)", metavar="<output_dir>")
+    parser.add_option("-o", action="store", default="./", type="string", dest="output_dir", help="Output directory (default = ./)", metavar="<output_dir>")
     parser.add_option("-r", action="store", default="uniref100", type="string", dest="redundant_db", help="Redundant database (\"uniref50\", \"uniref90\" or \"uniref100\"; default=uniref100)", metavar="<redundant_db>")
     parser.add_option("-s", action="store", default=10000, type="int", dest="max_sequences", help="Max. number of sequences (default=10000)", metavar="<max_sequences>")
     parser.add_option("-v", "--verbose", default=False, action="store_true", dest="verbose", help="Verbose mode (default = False)")
@@ -137,16 +150,19 @@ if __name__ == "__main__":
     if not os.path.exists(os.path.abspath(options.output_dir)):
             os.makedirs(os.path.abspath(options.output_dir))
     
-    # Initialize #
+    # Skip if query file already exists #
     query_file = os.path.join(os.path.abspath(options.output_dir), "query.fa")
+    if not os.path.exists(query_file):
+        # For header, sequence... #
+        for header, sequence in parse_fasta_file(os.path.abspath(options.input_file)):
+            # Write #
+            write(query_file, ">%s\n%s" % (header, sequence))
+    
+    # Skip if query db already exists #
     query_db = os.path.join(os.path.abspath(options.output_dir), "query.it_0.db")
-    nr_db
-    # For header, sequence... #
-    for header, sequence in parse_fasta_file(os.path.abspath(options.input_file)):
-        # Write #
-        write(query_file, ">%s\n%s" % (header, sequence))
-    # Create DB #
-    process = subprocess.check_output(["mmseqs", "createdb", query_file, query_db])
+    if not os.path.exists(query_db):
+        # Create DB #
+        process = subprocess.check_output(["mmseqs", "createdb", query_file, query_db])
     
     
 #mmseqs search ./examples/1ATG_A/query.db ./uniref/uniref50 ./examples/1ATG_A/query_uniref50.ali /home/ofornes/scratch/tmp/ --split-memory-limit 512000000000 --threads 32 -s 7.5
