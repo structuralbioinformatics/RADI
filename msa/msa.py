@@ -178,12 +178,14 @@ if __name__ == "__main__":
         if not os.path.exists(alignment_file):
             # Search DB #
             process = subprocess.check_output([os.path.join(mmseqs_path, "mmseqs"), "search", query_db, nr_db, alignment_file, dummy_dir, "--max-seqs", "300", "--split-memory-limit", "512000000000", "--threads", "32", "-s", "7.5"])
-        # If alignment has enough sequences or this is the last iteration... #
-        if (len([j for j in parse_file(alignment_file)]) == 300) or (i + 1 == 8):
-            next_query_db = os.path.join(os.path.abspath(options.output_dir), "query.%s.db" % options.redundant_db)
+        # If alignment has enough sequences... #
+        print(len([j for j in parse_file(alignment_file)]))
+        exit(0)
+        if len([j for j in parse_file(alignment_file)]) == 300: next_query_db = os.path.join(os.path.abspath(options.output_dir), "query.%s.db" % options.redundant_db)
+        # ... or if this is the last iteration... #
+        if ( or (i + 1 == 8): next_query_db = os.path.join(os.path.abspath(options.output_dir), "query.%s.db" % options.redundant_db)
         # ... Else... #
-        else:
-            next_query_db = os.path.join(os.path.abspath(options.output_dir), "query.%s.it_%s.db" % (options.nr_db, i + 2))
+        else: next_query_db = os.path.join(os.path.abspath(options.output_dir), "query.%s.it_%s.db" % (options.nr_db, i + 2))
         # Skip if next query DB already exists #
         if not os.path.exists(next_query_db):
             # Create DB #
