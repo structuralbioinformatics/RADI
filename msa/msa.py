@@ -183,7 +183,7 @@ if __name__ == "__main__":
         exit(0)
         if len([j for j in parse_file(alignment_file)]) == 300: next_query_db = os.path.join(os.path.abspath(options.output_dir), "query.%s.db" % options.redundant_db)
         # ... or if this is the last iteration... #
-        if ( or (i + 1 == 8): next_query_db = os.path.join(os.path.abspath(options.output_dir), "query.%s.db" % options.redundant_db)
+        elif i == 7: next_query_db = os.path.join(os.path.abspath(options.output_dir), "query.%s.db" % options.redundant_db)
         # ... Else... #
         else: next_query_db = os.path.join(os.path.abspath(options.output_dir), "query.%s.it_%s.db" % (options.nr_db, i + 2))
         # Skip if next query DB already exists #
