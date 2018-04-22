@@ -146,7 +146,8 @@ if __name__ == "__main__":
     options = parse_options()
 
     # Initialize #
-    msa = {}
+    msa = []
+    sequences = {}
     nr_db = os.path.join(uniref_path, options.nr_db)
     redundant_db = os.path.join(uniref_path, options.redundant_db)
     dummy_dir = os.path.abspath(options.dummy_dir)
@@ -163,7 +164,8 @@ if __name__ == "__main__":
             # Write #
             write(query_file, ">%s\n%s" % (header, sequence))
             # Add to MSA #
-            msa.setdefault(sequence, header)
+            msa.append((header, sequence))
+            sequences.setdefault(sequence, header)
     
     # Skip if query db already exists #
     query_db = os.path.join(os.path.abspath(options.output_dir), "query.%s.it_1.db" % options.nr_db)
@@ -189,7 +191,7 @@ if __name__ == "__main__":
             # Create DB #
             process = subprocess.check_output([os.path.join(mmseqs_path, "mmseqs"), "result2profile", query_db, nr_db, alignment_file, next_query_db])
             query_db = next_query_db
-        # End for loop if switched to redundant db #
+        # End if switched to redundant db #
         if options.redundant_db in query_db: break
 
     # Skip if alignment file already exists #
@@ -204,6 +206,24 @@ if __name__ == "__main__":
         # Get FASTA sequences #
         process = subprocess.check_output([os.path.join(mmseqs_path, "mmseqs"), "createseqfiledb", redundant_db, alignment_file, sequences_file])
 
+    # Skip if clustalo input file already exists #
+    clustalo_in_file = os.path.join(os.path.abspath(options.output_dir), "clustalo.in.fa")
+    if not os.path.exists(clustalo_in_file):
+        # For header, sequence... #
+        for header, sequence in parse_fasta_file(os.path.abspath(options.input_file)):
+            # Skip if sequence already exists #
+            if sequence in sequences: continue
+            # Add to MSA #
+            msa.append((header, sequence))
+            sequences.setdefault(sequence, header)
+            # End if enough sequences #
+            if len(msa) > 10000: break
+        # For header, sequence... #
+        for header, sequence in msa:
+            # Write #
+            write(clustalo_in_file, ">%s\n%s" % (header, sequence))
+            
+    
         #cat ./examples/1ATG_A/query.fa ./examples/1ATG_A/query_uniref100.ali.fa > ./examples/1ATG_A/query_clustalo_in.fa
 #clustalo -i ./examples/1ATG_A/query_clustalo_in.fa -o ./examples/1ATG_A/query_clustalo_out.fa
 #
