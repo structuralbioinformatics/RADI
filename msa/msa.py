@@ -2,7 +2,6 @@ import os, sys, re
 import optparse
 import subprocess
 
-
 #-------------#
 # Config      #
 #-------------#
@@ -146,6 +145,11 @@ if __name__ == "__main__":
     # Arguments & Options #
     options = parse_options()
 
+    # Initialize #
+    msa = {}
+    nr_db = os.path.join(uniref_path, options.nr_db)
+    redundant_db = os.path.join(uniref_path, options.redundant_db)
+    
     # Create output dir #
     if not os.path.exists(os.path.abspath(options.output_dir)):
             os.makedirs(os.path.abspath(options.output_dir))
@@ -157,19 +161,50 @@ if __name__ == "__main__":
         for header, sequence in parse_fasta_file(os.path.abspath(options.input_file)):
             # Write #
             write(query_file, ">%s\n%s" % (header, sequence))
+            # Add to MSA #
+            msa.setdefault(sequence, header)
     
     # Skip if query db already exists #
-    query_db = os.path.join(os.path.abspath(options.output_dir), "query.it_0.db")
+    query_db = os.path.join(os.path.abspath(options.output_dir), "query.%s.it_1.db" % options.nr_db)
     if not os.path.exists(query_db):
         # Create DB #
-        process = subprocess.check_output(["mmseqs", "createdb", query_file, query_db])
+        process = subprocess.check_output([os.path.join(mmseqs_path, "mmseqs"), "createdb", query_file, query_db])
     
+    # For each iteration... #
+    for i in range(8):
+        # Skip if alignment file already exists #
+        alignment_file = os.path.join(os.path.abspath(options.output_dir), "query.%s.it_%s.ali" % (options.nr_db, i + 1))
+        if not os.path.exists(alignment_file):
+            # Search DB #
+            process = subprocess.check_output([os.path.join(mmseqs_path, "mmseqs"), "search", query_db, nr_db, alignment_file, os.path.abspath(dummy_dir), "--max-seqs", "300", "--split-memory-limit", "512000000000", "--threads", "32", "-s", "7.5"])
+        # If alignment has enough sequences or this is the last iteration... #
+        if (len([j for j in parse_file(alignment_file)]) == 300) or (i + 1 == 8):
+            next_query_db = os.path.join(os.path.abspath(options.output_dir), "query.%s.db" % options.redundant_db)
+        # ... Else... #
+        else:
+            next_query_db = os.path.join(os.path.abspath(options.output_dir), "query.%s.it_%s.db" % (options.nr_db, i + 2))
+        # Skip if next query DB already exists #
+        if not os.path.exists(next_query_db):
+            # Create DB #
+            process = subprocess.check_output([os.path.join(mmseqs_path, "mmseqs"), "result2profile", query_db, nr_db, alignment_file, next_query_db])
+            query_db = next_query_db
+        # End for loop if switched to redundant db #
+        if options.redundant_db in query_db: break
+
+    # Skip if alignment file already exists #
+    alignment_file = os.path.join(os.path.abspath(options.output_dir), "query.%s.ali" % options.redundant_db)
+    if not os.path.exists(alignment_file):
+        # Search DB #
+        process = subprocess.check_output([os.path.join(mmseqs_path, "mmseqs"), "search", query_db, redundant_db, alignment_file, os.path.abspath(dummy_dir), "--max-seqs", "25000", "--split-memory-limit", "512000000000", "--threads", "32", "-s", "7.5", "--max-seq-id", "0.999"])
     
-#mmseqs search ./examples/1ATG_A/query.db ./uniref/uniref50 ./examples/1ATG_A/query_uniref50.ali /home/ofornes/scratch/tmp/ --split-memory-limit 512000000000 --threads 32 -s 7.5
-#mmseqs result2profile ./examples/1ATG_A/query.db ./uniref/uniref50 ./examples/1ATG_A/query_uniref50.ali ./examples/1ATG_A/query_uniref50.db
-#mmseqs search ./examples/1ATG_A/query_uniref50.db ./uniref/uniref100 ./examples/1ATG_A/query_uniref100.ali /home/ofornes/scratch/tmp/ --max-seqs 10000 --split-memory-limit 512000000000 --threads 32 -s 7.5 --max-seq-id 0.999
-#mmseqs createseqfiledb ./uniref/uniref100 ./examples/1ATG_A/query_uniref100.ali ./examples/1ATG_A/query_uniref100.ali.fa
-#cat ./examples/1ATG_A/query.fa ./examples/1ATG_A/query_uniref100.ali.fa > ./examples/1ATG_A/query_clustalo_in.fa
+    # Skip if sequences file already exists #
+    sequences_file = os.path.join(os.path.abspath(options.output_dir), "query.%s.fa" % options.redundant_db)
+    if not os.path.exists(sequences_file):
+        # Get FASTA sequences #
+        process = subprocess.check_output([os.path.join(mmseqs_path, "mmseqs"), "createseqfiledb", redundant_db, alignment_file, sequences_file])
+        
+
+        #cat ./examples/1ATG_A/query.fa ./examples/1ATG_A/query_uniref100.ali.fa > ./examples/1ATG_A/query_clustalo_in.fa
 #clustalo -i ./examples/1ATG_A/query_clustalo_in.fa -o ./examples/1ATG_A/query_clustalo_out.fa
 #
 #    [ofornes@cdr462 RADI]$ clustalo -i ./examples/1ATG_A/query_clustalo_in.fa -o ./examples/1ATG_A/query_clustalo_out.fa --threads=32 -v
