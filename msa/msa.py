@@ -149,7 +149,7 @@ if __name__ == "__main__":
     msa = {}
     nr_db = os.path.join(uniref_path, options.nr_db)
     redundant_db = os.path.join(uniref_path, options.redundant_db)
-    dummy_dir = os.path.abspath(dummy_dir)
+    dummy_dir = os.path.abspath(options.dummy_dir)
     
     # Create output dir #
     if not os.path.exists(os.path.abspath(options.output_dir)):
