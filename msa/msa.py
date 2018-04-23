@@ -223,9 +223,16 @@ if __name__ == "__main__":
         for header, sequence in msa:
             # Write #
             write(clustalo_in_file, ">%s\n%s" % (header, sequence))
-            
-    
-        #cat ./examples/1ATG_A/query.fa ./examples/1ATG_A/query_uniref100.ali.fa > ./examples/1ATG_A/query_clustalo_in.fa
+
+     # Skip if clustalo input file already exists #
+    clustalo_out_file = os.path.join(os.path.abspath(options.output_dir), "clustalo.out.fa")
+    if not os.path.exists(clustalo_in_file):
+        # Create MSA #
+        process = subprocess.check_output([os.path.join(clustalo_path, "clustalo"), "-i", clustalo_in_file, "-o", clustalo_out_file])
+
+        
+        
+#cat ./examples/1ATG_A/query.fa ./examples/1ATG_A/query_uniref100.ali.fa > ./examples/1ATG_A/query_clustalo_in.fa
 #clustalo -i ./examples/1ATG_A/query_clustalo_in.fa -o ./examples/1ATG_A/query_clustalo_out.fa
 #
 #    [ofornes@cdr462 RADI]$ clustalo -i ./examples/1ATG_A/query_clustalo_in.fa -o ./examples/1ATG_A/query_clustalo_out.fa --threads=32 -v
