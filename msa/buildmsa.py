@@ -163,9 +163,12 @@ if __name__ == "__main__":
         for header, sequence in parse_fasta_file(os.path.abspath(options.input_file)):
             # Write #
             write(query_file, ">%s\n%s" % (header, sequence))
-            # Add to MSA #
-            msa.append((header, sequence))
-            sequences.setdefault(sequence, header)
+    
+    # For header, sequence... #
+    for header, sequence in parse_fasta_file(query_file):
+        # Add to MSA #
+        msa.append((header, sequence))
+        sequences.setdefault(sequence, header)
     
     # Skip if query db already exists #
     query_db = os.path.join(os.path.abspath(options.output_dir), "query.%s.it_1.db" % options.nr_db)
@@ -224,26 +227,32 @@ if __name__ == "__main__":
             # Write #
             write(clustalo_in_file, ">%s\n%s" % (header, sequence))
 
-     # Skip if clustalo input file already exists #
+    # Skip if clustalo input file already exists #
     clustalo_out_file = os.path.join(os.path.abspath(options.output_dir), "clustalo.out.fa")
     if not os.path.exists(clustalo_out_file):
         # Create MSA #
-        process = subprocess.check_output([os.path.join(clustalo_path, "clustalo"), "-i", clustalo_in_file, "-o", clustalo_out_file])
-
-        
-        
-#cat ./examples/1ATG_A/query.fa ./examples/1ATG_A/query_uniref100.ali.fa > ./examples/1ATG_A/query_clustalo_in.fa
-#clustalo -i ./examples/1ATG_A/query_clustalo_in.fa -o ./examples/1ATG_A/query_clustalo_out.fa
-#
-#    [ofornes@cdr462 RADI]$ clustalo -i ./examples/1ATG_A/query_clustalo_in.fa -o ./examples/1ATG_A/query_clustalo_out.fa --threads=32 -v
-#    Using 32 threads
-#    Read 10001 sequences (type: Protein) from ./examples/1ATG_A/query_clustalo_in.fa
-#    Using 176 seeds (chosen with constant stride from length sorted seqs) for mBed (from a total of 10001 sequences)
-#    Calculating pairwise ktuple-distances...
-#    Ktuple-distance calculation progress done. CPU time: 144.20u 0.09s 00:02:24.29 Elapsed: 00:02:24
-#    mBed created 181 cluster/s (with a minimum of 1 and a soft maximum of 100 sequences each)
-#    Distance calculation within sub-clusters done. CPU time: 40.49u 0.01s 00:00:40.50 Elapsed: 00:00:40
-#    Guide-tree computation (mBed) done.
-#    Progressive alignment progress: 99 % (9900 out of 10000)
-#    Progressive alignment progress done. CPU time: 390.10u 161.68s 00:09:11.78 Elapsed: 00:09:12
-#    Alignment written to ./examples/1ATG_A/query_clustalo_out.fa
+        process = subprocess.check_output([os.path.join(clustalo_path, "clustalo"), "-i", clustalo_in_file, "-o", clustalo_out_file, "--threads=32"])
+    
+    # Skip if clean MSA already exists #
+    msa_file = os.path.join(os.path.abspath(options.output_dir), "msa.fa")
+    if not os.path.exists(msa_file):
+        # Initialize #
+        headers = []
+        sequences = []
+        # For header, sequence... #
+        for header, sequence in parse_fasta_file(clustalo_out_file, clean=False):
+            # Add to lists #
+            headers.append(header)
+            sequences.append(list(sequence))
+        # Transpose sequences #
+        sequences = zip(*sequences)
+        # For each position... #
+        for i in reversed(range(len(sequences))):
+            # If query position is a gap... #
+            if sequences[i][0] == "-": sequences.pop(i)
+        # Transpose sequences #
+        sequences = zip(*sequences)
+        # For each sequence... #
+        for i in range(len(headers)):
+            # Write #
+            write(msa_file, ">%s\n%s" % (headers[i], "".join(sequences[i])))
