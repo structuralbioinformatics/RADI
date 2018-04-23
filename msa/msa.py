@@ -226,7 +226,7 @@ if __name__ == "__main__":
 
      # Skip if clustalo input file already exists #
     clustalo_out_file = os.path.join(os.path.abspath(options.output_dir), "clustalo.out.fa")
-    if not os.path.exists(clustalo_in_file):
+    if not os.path.exists(clustalo_out_file):
         # Create MSA #
         process = subprocess.check_output([os.path.join(clustalo_path, "clustalo"), "-i", clustalo_in_file, "-o", clustalo_out_file])
 
