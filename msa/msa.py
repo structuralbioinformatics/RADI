@@ -211,7 +211,7 @@ if __name__ == "__main__":
     clustalo_in_file = os.path.join(os.path.abspath(options.output_dir), "clustalo.in.fa")
     if not os.path.exists(clustalo_in_file):
         # For header, sequence... #
-        for header, sequence in parse_fasta_file(os.path.abspath(options.input_file)):
+        for header, sequence in parse_fasta_file(sequences_file):
             # Skip if sequence already exists #
             if sequence in sequences: continue
             # Add to MSA #
