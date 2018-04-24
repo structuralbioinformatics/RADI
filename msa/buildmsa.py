@@ -118,15 +118,14 @@ def parse_options():
 
     """
 
-    parser = optparse.OptionParser("python2.7 %prog -i <input_file> [--dummy=dummy_dir -j <max_iterations> -n <nr_database> -r <redundant_db> -o <output_dir> -s <max_sequences> -v]")
+    parser = optparse.OptionParser("python2.7 %prog -i <input_file> [--dummy=dummy_dir -n <nr_database> -r <redundant_db> -o <output_dir> -s <max_sequences> -v]")
 
     parser.add_option("--dummy", default="/tmp/", action="store", type="string", dest="dummy_dir", help="Dummy directory (default = /tmp/)", metavar="<dummy_dir>")
     parser.add_option("-i", action="store", type="string", dest="input_file", help="Input file (in FASTA format)", metavar="<input_file>")
-    parser.add_option("-j", action="store", default=8, type="int", dest="max_iterations", help="Max. number of iterations (default=8)", metavar="<max_iterations>")
     parser.add_option("-n", action="store", default="uniref50", type="string", dest="nr_db", help="Non-redundant database (\"uniref50\", \"uniref90\" or \"uniref100\"; default=uniref50)", metavar="<nr_db>")
     parser.add_option("-o", action="store", default="./", type="string", dest="output_dir", help="Output directory (default = ./)", metavar="<output_dir>")
     parser.add_option("-r", action="store", default="uniref100", type="string", dest="redundant_db", help="Redundant database (\"uniref50\", \"uniref90\" or \"uniref100\"; default=uniref100)", metavar="<redundant_db>")
-    parser.add_option("-s", action="store", default=25000, type="int", dest="max_sequences", help="Max. number of sequences (default=25000)", metavar="<max_sequences>")
+    parser.add_option("-s", action="store", default=10000, type="int", dest="max_sequences", help="Max. number of sequences (default=10000)", metavar="<max_sequences>")
     parser.add_option("-v", "--verbose", default=False, action="store_true", dest="verbose", help="Verbose mode (default = False)")
 
     (options, args) = parser.parse_args()
@@ -155,6 +154,10 @@ if __name__ == "__main__":
     # Create output dir #
     if not os.path.exists(os.path.abspath(options.output_dir)):
             os.makedirs(os.path.abspath(options.output_dir))
+
+    # Create dummy dir #
+    if not os.path.exists(dummy_dir):
+            os.makedirs(dummy_dir)
     
     # Skip if query file already exists #
     query_file = os.path.join(os.path.abspath(options.output_dir), "query.fa")
@@ -163,46 +166,28 @@ if __name__ == "__main__":
         for header, sequence in parse_fasta_file(os.path.abspath(options.input_file)):
             # Write #
             write(query_file, ">%s\n%s" % (header, sequence))
-    
-    # For header, sequence... #
-    for header, sequence in parse_fasta_file(query_file):
-        # Add to MSA #
-        msa.append((header, sequence))
-        sequences.setdefault(sequence, header)
-    
-    # Skip if query db already exists #
-    query_db = os.path.join(os.path.abspath(options.output_dir), "query.%s.it_1.db" % options.nr_db)
-    if not os.path.exists(query_db):
-        # Create DB #
-        process = subprocess.check_output([os.path.join(mmseqs_path, "mmseqs"), "createdb", query_file, query_db])
-    
+
     # Skip if redundant query db already exists #
     redundant_query_db = os.path.join(os.path.abspath(options.output_dir), "query.%s.db" % options.redundant_db)
     if not os.path.exists(redundant_query_db):
-        # For each iteration... #
-        for i in range(8):
-            # Skip if alignment file already exists #
-            alignment_file = os.path.join(os.path.abspath(options.output_dir), "query.%s.it_%s.ali" % (options.nr_db, i + 1))
-            if not os.path.exists(alignment_file):
-                # Search DB #
-                process = subprocess.check_output([os.path.join(mmseqs_path, "mmseqs"), "search", query_db, nr_db, alignment_file, dummy_dir, "--max-seqs", "300", "--split-memory-limit", "512000000000", "--threads", "32", "-s", "7.5"])
-            # If alignment has enough sequences or if this is the last iteration...
-            if len([j for j in parse_file(alignment_file)]) >= 300 or i == 7:
-                # Create DB #
-                process = subprocess.check_output([os.path.join(mmseqs_path, "mmseqs"), "result2profile", query_db, nr_db, alignment_file, redundant_query_db])
-                break
-            # Skip if next query DB already exists #
-            if not os.path.exists(next_query_db):
-                # Create DB #
-                next_query_db = os.path.join(os.path.abspath(options.output_dir), "query.%s.it_%s.db" % (options.nr_db, i + 2))
-                process = subprocess.check_output([os.path.join(mmseqs_path, "mmseqs"), "result2profile", query_db, nr_db, alignment_file, next_query_db])
-                query_db = next_query_db
+        # Skip if nr query db already exists #
+        nr_query_db = os.path.join(os.path.abspath(options.output_dir), "query.%s.db" % options.nr_db)
+        if not os.path.exists(nr_query_db):
+            # Create DB #
+            process = subprocess.check_output([os.path.join(mmseqs_path, "mmseqs"), "createdb", query_file, nr_query_db])
+        # Skip if alignment file already exists #
+        alignment_file = os.path.join(os.path.abspath(options.output_dir), "query.%s.ali" % options.nr_db)
+        if not os.path.exists(alignment_file):
+            # Search DB #
+            process = subprocess.check_output([os.path.join(mmseqs_path, "mmseqs"), "search", nr_query_db, nr_db, alignment_file, dummy_dir, "--split-memory-limit", "512000000000", "--threads", "32", "--num-iterations", "4"])
+        # Create DB #
+        process = subprocess.check_output([os.path.join(mmseqs_path, "mmseqs"), "result2profile", nr_query_db, nr_db, alignment_file, redundant_query_db])
 
     # Skip if alignment file already exists #
     alignment_file = os.path.join(os.path.abspath(options.output_dir), "query.%s.ali" % options.redundant_db)
     if not os.path.exists(alignment_file):
         # Search DB #
-        process = subprocess.check_output([os.path.join(mmseqs_path, "mmseqs"), "search", redundant_query_db, redundant_db, alignment_file, dummy_dir, "--max-seqs", str(options.max_sequences * 2), "--split-memory-limit", "512000000000", "--threads", "32", "-s", "7.5", "--max-seq-id", "0.999"])
+        process = subprocess.check_output([os.path.join(mmseqs_path, "mmseqs"), "search", redundant_query_db, redundant_db, alignment_file, dummy_dir, "--max-seqs", "1000000", "--split-memory-limit", "512000000000", "--threads", "32", "-s", "7.5", "--max-seq-id", "0.999"])
 
     # Skip if sequences file already exists #
     sequences_file = os.path.join(os.path.abspath(options.output_dir), "query.%s.fa" % options.redundant_db)
@@ -214,6 +199,12 @@ if __name__ == "__main__":
     clustalo_in_file = os.path.join(os.path.abspath(options.output_dir), "clustalo.in.fa")
     if not os.path.exists(clustalo_in_file):
         # For header, sequence... #
+        for header, sequence in parse_fasta_file(query_file):
+            # Add to MSA #
+            msa.append((header, sequence))
+            sequences.setdefault(sequence, header)
+            break
+        # For header, sequence... #
         for header, sequence in parse_fasta_file(sequences_file):
             # Skip if sequence already exists #
             if sequence in sequences: continue
@@ -221,7 +212,7 @@ if __name__ == "__main__":
             msa.append((header, sequence))
             sequences.setdefault(sequence, header)
             # End if enough sequences #
-            if len(msa) > 10000: break
+            if len(msa) > options.max_sequences: break
         # For header, sequence... #
         for header, sequence in msa:
             # Write #
