@@ -147,7 +147,7 @@ if __name__ == "__main__":
     # Initialize #
     msa = []
     sequences = {}
-    nr_db = os.path.join(uniref_path, options.nr_db)
+    nr_db = os.path.join(uniref_path, "%.db" % options.nr_db)
     redundant_db = os.path.join(uniref_path, options.redundant_db)
     dummy_dir = os.path.abspath(options.dummy_dir)
     
@@ -158,14 +158,6 @@ if __name__ == "__main__":
     # Create dummy dir #
     if not os.path.exists(dummy_dir):
             os.makedirs(dummy_dir)
-    
-    # Skip if query file already exists #
-    query_file = os.path.join(os.path.abspath(options.output_dir), "query.fa")
-    if not os.path.exists(query_file):
-        # For header, sequence... #
-        for header, sequence in parse_fasta_file(os.path.abspath(options.input_file)):
-            # Write #
-            write(query_file, ">%s\n%s" % (header, sequence))
 
     # Skip if redundant query db already exists #
     redundant_query_db = os.path.join(os.path.abspath(options.output_dir), "query.%s.db" % options.redundant_db)
@@ -174,7 +166,7 @@ if __name__ == "__main__":
         nr_query_db = os.path.join(os.path.abspath(options.output_dir), "query.%s.db" % options.nr_db)
         if not os.path.exists(nr_query_db):
             # Create DB #
-            process = subprocess.check_output([os.path.join(mmseqs_path, "mmseqs"), "createdb", query_file, nr_query_db])
+            process = subprocess.check_output([os.path.join(mmseqs_path, "mmseqs"), "createdb", os.path.abspath(options.input_file), nr_query_db])
         # Skip if alignment file already exists #
         alignment_file = os.path.join(os.path.abspath(options.output_dir), "query.%s.ali" % options.nr_db)
         if not os.path.exists(alignment_file):
@@ -199,7 +191,7 @@ if __name__ == "__main__":
     clustalo_in_file = os.path.join(os.path.abspath(options.output_dir), "clustalo.in.fa")
     if not os.path.exists(clustalo_in_file):
         # For header, sequence... #
-        for header, sequence in parse_fasta_file(query_file):
+        for header, sequence in parse_fasta_file(os.path.abspath(options.input_file)):
             # Add to MSA #
             msa.append((header, sequence))
             sequences.setdefault(sequence, header)
