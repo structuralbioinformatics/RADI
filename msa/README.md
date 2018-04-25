@@ -6,4 +6,4 @@ HH-blits can be downloaded from https://github.com/soedinglab/hh-suite.git
 
 mmseqs search query_db nr_db alignment_file dummy_dir --max-seqs 300 --split-memory-limit 512000000000 --threads 32 -s 7.5
 
-
+a
