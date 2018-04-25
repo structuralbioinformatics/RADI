@@ -5,19 +5,11 @@ import subprocess
 #-------------#
 # Config      #
 #-------------#
-account = None
-cluster_name = "hydra.prib.upf.edu"
-memory = "512Gb"
-platform = "slurm"
-processors = 32
-queue = None
-user_email = "oriol@cmmt.ubc.ca"
-walltime = "168:00:00"
 # e.g. conda install -c bioconda clustalo
 clustalo_path = "/home/ofornes/.anaconda2.7/bin"
 # e.g. conda install -c bioconda mmseqs2
 mmseqs_path = "/home/ofornes/.anaconda2.7/bin"
-# i.e. dir where uniref.sh was exec
+# i.e. directory where uniref.sh was exec
 uniref_path = "/home/ofornes/scratch/RADI/uniref"
 
 #-------------#
@@ -148,7 +140,7 @@ if __name__ == "__main__":
     msa = []
     sequences = {}
     nr_db = os.path.join(uniref_path, "%s.db" % options.nr_db)
-    redundant_db = os.path.join(uniref_path, options.redundant_db)
+    redundant_db = os.path.join(uniref_path, "%s.db" % options.redundant_db)
     dummy_dir = os.path.abspath(options.dummy_dir)
     
     # Create output dir #
