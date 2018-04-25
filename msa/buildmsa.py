@@ -147,7 +147,7 @@ if __name__ == "__main__":
     # Initialize #
     msa = []
     sequences = {}
-    nr_db = os.path.join(uniref_path, "%.db" % options.nr_db)
+    nr_db = os.path.join(uniref_path, "%s.db" % options.nr_db)
     redundant_db = os.path.join(uniref_path, options.redundant_db)
     dummy_dir = os.path.abspath(options.dummy_dir)
     
