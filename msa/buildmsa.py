@@ -163,7 +163,7 @@ if __name__ == "__main__":
         alignment_file = os.path.join(os.path.abspath(options.output_dir), "query.%s.ali" % options.nr_db)
         if not os.path.exists(alignment_file):
             # Search DB #
-            process = subprocess.check_output([os.path.join(mmseqs_path, "mmseqs"), "search", nr_query_db, nr_db, alignment_file, dummy_dir, "--split-memory-limit", "512000000000", "--threads", "32", "--num-iterations", "4"])
+            process = subprocess.check_output([os.path.join(mmseqs_path, "mmseqs"), "search", nr_query_db, nr_db, alignment_file, dummy_dir, "--split-memory-limit", "500000000000", "--threads", "32", "--num-iterations", "4"])
         # Create DB #
         process = subprocess.check_output([os.path.join(mmseqs_path, "mmseqs"), "result2profile", nr_query_db, nr_db, alignment_file, redundant_query_db])
 
@@ -171,7 +171,7 @@ if __name__ == "__main__":
     alignment_file = os.path.join(os.path.abspath(options.output_dir), "query.%s.ali" % options.redundant_db)
     if not os.path.exists(alignment_file):
         # Search DB #
-        process = subprocess.check_output([os.path.join(mmseqs_path, "mmseqs"), "search", redundant_query_db, redundant_db, alignment_file, dummy_dir, "--max-seqs", "1000000", "--split-memory-limit", "512000000000", "--threads", "32", "-s", "7.5", "--max-seq-id", "0.999"])
+        process = subprocess.check_output([os.path.join(mmseqs_path, "mmseqs"), "search", redundant_query_db, redundant_db, alignment_file, dummy_dir, "--max-seqs", "1000000", "--split-memory-limit", "500000000000", "--threads", "32", "-s", "7.5", "--max-seq-id", "0.999"])
 
     # Skip if sequences file already exists #
     sequences_file = os.path.join(os.path.abspath(options.output_dir), "query.%s.fa" % options.redundant_db)
