@@ -1,0 +1,12 @@
+name: radi
+channels:
+  - bioconda
+  - conda-forge
+  - defaults
+  - salilab
+dependencies:
+  - clustalo=1.2.4
+  - dssp=3.0.0
+  - mmseqs2=2.23394
+  - python=2.7.14
+prefix: $HOME/.miniconda2.7/envs/radi
