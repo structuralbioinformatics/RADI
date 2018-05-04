@@ -11,8 +11,8 @@ conda update --name base conda
 
 * Create a new `modcre` conda environment:
 
-`conda create --name modcre python=2.7.14`
+`conda create --name radi python=2.7.14`
 
 * Import conda environment for ModCRE:
 
-`conda env update --file conda-env.yml --name modcre`
+`conda env update --file conda-env.yml --name radi`
