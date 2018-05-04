@@ -4,8 +4,10 @@
 
 * (optional) [Download](https://conda.io/miniconda.html), install and update Miniconda:
 
-`bash Miniconda2-latest-Linux-x86_64.sh`
-`conda update --name base conda`
+```
+bash Miniconda2-latest-Linux-x86_64.sh
+conda update --name base conda
+```
 
 * Create a new `modcre` conda environment:
 
