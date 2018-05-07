@@ -199,7 +199,7 @@ if __name__ == "__main__":
     famsa_out_file = os.path.join(os.path.abspath(options.output_dir), "famsa.out.fa")
     if not os.path.exists(famsa_out_file):
         # Create MSA #
-        process = subprocess.check_output(["famsa", famsa_in_file, famsa_out_file, "-t", "32"])
+        process = subprocess.check_output(["famsa", "-t", "32", famsa_in_file, famsa_out_file])
     
     # Skip if clean MSA already exists #
     msa_file = os.path.join(os.path.abspath(options.output_dir), "msa.fa")
