@@ -171,7 +171,7 @@ if __name__ == "__main__":
     alignment_file = os.path.join(os.path.abspath(options.output_dir), "query.%s.ali" % options.redundant_db)
     if not os.path.exists(alignment_file):
         # Search DB #
-        process = subprocess.check_output([os.path.join(mmseqs_path, "mmseqs"), "search", redundant_query_db, redundant_db, alignment_file, dummy_dir, "--max-seqs", "1000000", "--split-memory-limit", "500000000000", "--threads", "32", "-s", "7.5", "--max-seq-id", "0.999"])
+        process = subprocess.check_output([os.path.join(mmseqs_path, "mmseqs"), "search", redundant_query_db, redundant_db, alignment_file, dummy_dir, "--max-seqs", "1000000", "--split-memory-limit", "500000000000", "--threads", "32", "-s", "7.5", "--max-seq-id", "1.0"])
 
     # Skip if sequences file already exists #
     sequences_file = os.path.join(os.path.abspath(options.output_dir), "query.%s.fa" % options.redundant_db)
