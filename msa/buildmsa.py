@@ -2,13 +2,6 @@ import os, sys, re
 import optparse
 import subprocess
 
-#-------------#
-# Config      #
-#-------------#
-# e.g. conda install -c bioconda clustalo
-clustalo_path = "/home/ofornes/.miniconda2.7/envs/radi/bin"
-# e.g. conda install -c bioconda mmseqs2
-mmseqs_path = "/home/ofornes/.miniconda2.7/envs/radi/bin"
 # i.e. directory where uniref.sh was exec
 uniref_path = "/home/ofornes/scratch/RADI/uniref"
 
@@ -110,7 +103,7 @@ def parse_options():
 
     """
 
-    parser = optparse.OptionParser("python2.7 %prog -i <input_file> [--dummy=dummy_dir -n <nr_database> -r <redundant_db> -o <output_dir> -s <max_sequences> -v]")
+    parser = optparse.OptionParser("python2.7 %prog -i <input_file> [--dummy=dummy_dir -n <nr_database> -r <redundant_db> -o <output_dir> -s <max_sequences> -u <uniref_dir>]")
 
     parser.add_option("--dummy", default="/tmp/", action="store", type="string", dest="dummy_dir", help="Dummy directory (default = /tmp/)", metavar="<dummy_dir>")
     parser.add_option("-i", action="store", type="string", dest="input_file", help="Input file (in FASTA format)", metavar="<input_file>")
@@ -118,7 +111,7 @@ def parse_options():
     parser.add_option("-o", action="store", default="./", type="string", dest="output_dir", help="Output directory (default = ./)", metavar="<output_dir>")
     parser.add_option("-r", action="store", default="uniref100", type="string", dest="redundant_db", help="Redundant database (\"uniref50\", \"uniref90\" or \"uniref100\"; default=uniref100)", metavar="<redundant_db>")
     parser.add_option("-s", action="store", default=10000, type="int", dest="max_sequences", help="Max. number of sequences (default=10000)", metavar="<max_sequences>")
-    parser.add_option("-v", "--verbose", default=False, action="store_true", dest="verbose", help="Verbose mode (default = False)")
+    parser.add_option("-u", action="store", type="string", dest="uniref_dir", help="UniRef directory (i.e. where uniref.sh was exec)", metavar="<uniref_dir>")
 
     (options, args) = parser.parse_args()
 
@@ -158,30 +151,30 @@ if __name__ == "__main__":
         nr_query_db = os.path.join(os.path.abspath(options.output_dir), "query.%s.db" % options.nr_db)
         if not os.path.exists(nr_query_db):
             # Create DB #
-            process = subprocess.check_output([os.path.join(mmseqs_path, "mmseqs"), "createdb", os.path.abspath(options.input_file), nr_query_db])
+            process = subprocess.check_output(["mmseqs", "createdb", os.path.abspath(options.input_file), nr_query_db])
         # Skip if alignment file already exists #
         alignment_file = os.path.join(os.path.abspath(options.output_dir), "query.%s.ali" % options.nr_db)
         if not os.path.exists(alignment_file):
             # Search DB #
-            process = subprocess.check_output([os.path.join(mmseqs_path, "mmseqs"), "search", nr_query_db, nr_db, alignment_file, dummy_dir, "--split-memory-limit", "500000000000", "--threads", "32", "-s", "7.5", "--num-iterations", "4"])
+            process = subprocess.check_output(["mmseqs", "search", nr_query_db, nr_db, alignment_file, dummy_dir, "--split-memory-limit", "500000000000", "--threads", "32", "-s", "7.5", "--num-iterations", "4"])
         # Create DB #
-        process = subprocess.check_output([os.path.join(mmseqs_path, "mmseqs"), "result2profile", nr_query_db, nr_db, alignment_file, redundant_query_db])
+        process = subprocess.check_output(["mmseqs", "result2profile", nr_query_db, nr_db, alignment_file, redundant_query_db])
 
     # Skip if alignment file already exists #
     alignment_file = os.path.join(os.path.abspath(options.output_dir), "query.%s.ali" % options.redundant_db)
     if not os.path.exists(alignment_file):
         # Search DB #
-        process = subprocess.check_output([os.path.join(mmseqs_path, "mmseqs"), "search", redundant_query_db, redundant_db, alignment_file, dummy_dir, "--max-seqs", "1000000", "--split-memory-limit", "500000000000", "--threads", "32", "-s", "7.5", "--max-seq-id", "1.0"])
+        process = subprocess.check_output(["mmseqs", "search", redundant_query_db, redundant_db, alignment_file, dummy_dir, "--max-seqs", "1000000", "--split-memory-limit", "500000000000", "--threads", "32", "-s", "7.5", "--max-seq-id", "1.0"])
 
     # Skip if sequences file already exists #
     sequences_file = os.path.join(os.path.abspath(options.output_dir), "query.%s.fa" % options.redundant_db)
     if not os.path.exists(sequences_file):
         # Get FASTA sequences #
-        process = subprocess.check_output([os.path.join(mmseqs_path, "mmseqs"), "createseqfiledb", redundant_db, alignment_file, sequences_file])
+        process = subprocess.check_output(["mmseqs", "createseqfiledb", redundant_db, alignment_file, sequences_file])
 
-    # Skip if clustalo input file already exists #
-    clustalo_in_file = os.path.join(os.path.abspath(options.output_dir), "clustalo.in.fa")
-    if not os.path.exists(clustalo_in_file):
+    # Skip if FAMSA input file already exists #
+    famsa_in_file = os.path.join(os.path.abspath(options.output_dir), "famsa.in.fa")
+    if not os.path.exists(famsa_in_file):
         # For header, sequence... #
         for header, sequence in parse_fasta_file(os.path.abspath(options.input_file)):
             # Add to MSA #
@@ -200,13 +193,13 @@ if __name__ == "__main__":
         # For header, sequence... #
         for header, sequence in msa:
             # Write #
-            write(clustalo_in_file, ">%s\n%s" % (header, sequence))
+            write(famsa_in_file, ">%s\n%s" % (header, sequence))
 
-    # Skip if clustalo input file already exists #
-    clustalo_out_file = os.path.join(os.path.abspath(options.output_dir), "clustalo.out.fa")
-    if not os.path.exists(clustalo_out_file):
+    # Skip if FAMSA output file already exists #
+    famsa_out_file = os.path.join(os.path.abspath(options.output_dir), "famsa.out.fa")
+    if not os.path.exists(famsa_out_file):
         # Create MSA #
-        process = subprocess.check_output([os.path.join(clustalo_path, "clustalo"), "-i", clustalo_in_file, "-o", clustalo_out_file, "--threads=32"])
+        process = subprocess.check_output(["famsa", famsa_in_file, famsa_out_file, "-t", "32"])
     
     # Skip if clean MSA already exists #
     msa_file = os.path.join(os.path.abspath(options.output_dir), "msa.fa")
@@ -215,7 +208,7 @@ if __name__ == "__main__":
         headers = []
         sequences = []
         # For header, sequence... #
-        for header, sequence in parse_fasta_file(clustalo_out_file, clean=False):
+        for header, sequence in parse_fasta_file(famsa_out_file, clean=False):
             # Add to lists #
             headers.append(header)
             sequences.append(list(sequence))
