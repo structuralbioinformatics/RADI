@@ -146,12 +146,12 @@ if __name__ == "__main__":
         
     # Skip if nr query db already exists #
     nr_query_db = os.path.join(os.path.abspath(options.output_dir), "query.%s.db" % options.nr_db)
-    if not os.path.exists(query_db):
+    if not os.path.exists(nr_query_db):
         # Create DB #
         process = subprocess.check_output(["mmseqs", "createdb", os.path.abspath(options.input_file), nr_query_db])
     # Skip if nr alignment file already exists #
     nr_alignment_file = os.path.join(os.path.abspath(options.output_dir), "query.%s.ali" % options.nr_db)
-    if not os.path.exists(alignment_file):
+    if not os.path.exists(nr_alignment_file):
         # Search DB #
         process = subprocess.check_output(["mmseqs", "search", nr_query_db, nr_db, nr_alignment_file, dummy_dir, "--threads", "32", "-s", "7.5", "--num-iterations", "4"])
     # Skip if redundant query db already exists #
@@ -214,7 +214,7 @@ if __name__ == "__main__":
 
     # Skip if HMMalign input file already exists #
     hmmalign_in_file = os.path.join(os.path.abspath(options.output_dir), "hmmalign.in.fa")
-    if not os.path.exists(hmmer_in_file):
+    if not os.path.exists(hmmalign_in_file):
         # Initialize #
         msa = []
         sequences = {}
