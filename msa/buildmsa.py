@@ -176,10 +176,10 @@ if __name__ == "__main__":
         process = subprocess.check_output(["mmseqs", "createseqfiledb", db, alignment_file, sequences_file])
 
     #----------#
-    # ClustalΩ #
+    # ClustalO #
     #----------#
 
-    # Skip if ClustalΩ input file already exists #
+    # Skip if ClustalO input file already exists #
     clustalo_in_file = os.path.join(os.path.abspath(options.output_dir), "clustalo.in.fa")
     if not os.path.exists(clustalo_in_file):
         # Initialize #
@@ -202,7 +202,7 @@ if __name__ == "__main__":
         for header, sequence in msa:
             # Write #
             write(clustalo_in_file, ">%s\n%s" % (header, sequence))
-    # Skip if ClustalΩ output file already exists #
+    # Skip if ClustalO output file already exists #
     clustalo_out_file = os.path.join(os.path.abspath(options.output_dir), "clustalo.out.fa")
     if not os.path.exists(clustalo_out_file):
         # Create MSA #
