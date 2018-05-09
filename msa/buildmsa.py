@@ -168,7 +168,7 @@ if __name__ == "__main__":
     nr_sequences_file = os.path.join(os.path.abspath(options.output_dir), "query.%s.fa" % options.nr_db)
     if not os.path.exists(nr_sequences_file):
         # Get FASTA sequences #
-        process = subprocess.check_output(["mmseqs", "createseqfiledb", nr_db, alignment_file, nr_sequences_file])
+        process = subprocess.check_output(["mmseqs", "createseqfiledb", nr_db, nr_alignment_file, nr_sequences_file])
     # Skip if redundant sequences file already exists #
     sequences_file = os.path.join(os.path.abspath(options.output_dir), "query.%s.fa" % options.db)
     if not os.path.exists(sequences_file):
