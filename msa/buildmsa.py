@@ -144,21 +144,21 @@ if __name__ == "__main__":
     # MMseqs2  #
     #----------#
         
+    # Skip if nr query db already exists #
+    nr_query_db = os.path.join(os.path.abspath(options.output_dir), "query.%s.db" % options.nr_db)
+    if not os.path.exists(query_db):
+        # Create DB #
+        process = subprocess.check_output(["mmseqs", "createdb", os.path.abspath(options.input_file), nr_query_db])
+    # Skip if nr alignment file already exists #
+    nr_alignment_file = os.path.join(os.path.abspath(options.output_dir), "query.%s.ali" % options.nr_db)
+    if not os.path.exists(alignment_file):
+        # Search DB #
+        process = subprocess.check_output(["mmseqs", "search", nr_query_db, nr_db, nr_alignment_file, dummy_dir, "--threads", "32", "-s", "7.5", "--num-iterations", "4"])
     # Skip if redundant query db already exists #
     query_db = os.path.join(os.path.abspath(options.output_dir), "query.%s.db" % options.db)
     if not os.path.exists(query_db):
-        # Skip if nr query db already exists #
-        nr_query_db = os.path.join(os.path.abspath(options.output_dir), "query.%s.db" % options.nr_db)
-        if not os.path.exists(query_db):
-            # Create DB #
-            process = subprocess.check_output(["mmseqs", "createdb", os.path.abspath(options.input_file), nr_query_db])
-        # Skip if alignment file already exists #
-        alignment_file = os.path.join(os.path.abspath(options.output_dir), "query.%s.ali" % options.nr_db)
-        if not os.path.exists(alignment_file):
-            # Search DB #
-            process = subprocess.check_output(["mmseqs", "search", nr_query_db, nr_db, alignment_file, dummy_dir, "--threads", "32", "-s", "7.5", "--num-iterations", "4"])
         # Create DB #
-        process = subprocess.check_output(["mmseqs", "result2profile", nr_query_db, nr_db, alignment_file, query_db])
+        process = subprocess.check_output(["mmseqs", "result2profile", nr_query_db, nr_db, nr_alignment_file, query_db])
     # Skip if alignment file already exists #
     alignment_file = os.path.join(os.path.abspath(options.output_dir), "query.%s.ali" % options.db)
     if not os.path.exists(alignment_file):
@@ -206,7 +206,7 @@ if __name__ == "__main__":
     clustalo_out_file = os.path.join(os.path.abspath(options.output_dir), "clustalo.out.fa")
     if not os.path.exists(clustalo_out_file):
         # Create MSA #
-        process = subprocess.check_output(["clustalo", "-i", clustalo_in_file, "-o", clustalo_out_file,"--threads", "32"])
+        process = subprocess.check_output(["clustalo", "-i", clustalo_in_file, "-o", clustalo_out_file, "--threads", "32"])
 
     #----------#
     # HMMER    #
