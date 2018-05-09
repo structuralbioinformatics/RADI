@@ -235,10 +235,10 @@ if __name__ == "__main__":
         # Create HMM #
         process = subprocess.check_output(["hmmbuild", hmmalign_in_hmm, clustalo_out_file]) 
     # Skip if HMMER output file already exists #
-    hmmalign_out_hmm = os.path.join(os.path.abspath(options.output_dir), "hmmalign.out.a2m")
+    hmmalign_out_hmm = os.path.join(os.path.abspath(options.output_dir), "hmmalign.out.sto")
     if not os.path.exists(hmmalign_out_hmm):
         # Create MSA #
-        process = subprocess.check_output(["hmmalign", "--mapali", clustalo_out_file, "-o", hmmalign_out_hmm, "--outformat", "A2M", "--trim", hmmalign_in_hmm, hmmalign_in_file])
+        process = subprocess.check_output(["hmmalign", "--mapali", clustalo_out_file, "-o", hmmalign_out_hmm, "--trim", hmmalign_in_hmm, hmmalign_in_file])
 
 #    msa_file = os.path.join(os.path.abspath(options.output_dir), "msa.fa")
 #    if not os.path.exists(msa_file):
