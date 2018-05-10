@@ -277,7 +277,7 @@ if __name__ == "__main__":
     famsa_out_file = os.path.join(os.path.abspath(options.output_dir), "famsa.out.fa")
     if not os.path.exists(famsa_out_file):
         # Create MSA #
-        process = subprocess.check_output(["famsa", "-t", "32", hmmalign_in_hmm, hmmalign_in_file])
+        process = subprocess.check_output(["famsa", "-t", "32", famsa_in_file, famsa_out_file])
 
     #----------#
     # MSAs     #
@@ -285,7 +285,7 @@ if __name__ == "__main__":
 
     # Skip if MSA file already exists #
     hmmalign_msa_file = os.path.join(os.path.abspath(options.output_dir), "msa.hmmalign.fa")
-    if not os.path.exists(hmmer_msa_file):
+    if not os.path.exists(hmmalign_msa_file):
         # Initialize #
         uniq = set()
         headers = []
