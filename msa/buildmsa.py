@@ -248,6 +248,7 @@ if __name__ == "__main__":
     msa_file = os.path.join(os.path.abspath(options.output_dir), "msa.fa")
     if not os.path.exists(msa_file):
         # Initialize #
+        uniq = set()
         headers = []
         sequences = []
         # For header, sequence... #
@@ -265,5 +266,10 @@ if __name__ == "__main__":
         sequences = zip(*sequences)
         # For each sequence... #
         for i in range(len(headers)):
-            # Write #
-            write(msa_file, ">%s\n%s" % (headers[i], "".join(sequences[i])))
+            # If sequence is unique... #
+            sequence "".join(sequences[i])
+            if sequence not in uniq:
+                # Write #
+                write(msa_file, ">%s\n%s" % (headers[i], sequence))
+                # Sequence is unique #
+                uniq.add(sequence)
