@@ -3,7 +3,7 @@ import optparse
 import subprocess
 
 # i.e. directory where uniref.sh was exec
-uniref_path = "/home/ofornes/scratch/RADI/uniref"
+uniref_path = "/home/ofornes/RADI/msa/uniref"
 
 #-------------#
 # Parsers     #
@@ -245,8 +245,47 @@ if __name__ == "__main__":
         # Create MSA #
         process = subprocess.check_output([os.path.join(os.path.dirname(os.path.realpath(__file__)), "reformat.pl"), hmmalign_out_file, hmmalign_out_fas])
 
-    msa_file = os.path.join(os.path.abspath(options.output_dir), "msa.fa")
-    if not os.path.exists(msa_file):
+    #----------#
+    # FAMSA    #
+    #----------#
+
+    # Skip if FAMSA input file already exists #
+    famsa_in_file = os.path.join(os.path.abspath(options.output_dir), "famsa.in.fa")
+    if not os.path.exists(famsa_in_file):
+        # Initialize #
+        msa = []
+        sequences = {}
+        # For header, sequence... #
+        for header, sequence in parse_fasta_file(clustalo_in_file):
+            # Skip if sequence already exists #
+            if sequence in sequences: continue
+            # Add to MSA #
+            msa.append((header, sequence))
+            sequences.setdefault(sequence, header)
+        # For header, sequence... #
+        for header, sequence in parse_fasta_file(hmmalign_in_file):
+            # Skip if sequence already exists #
+            if sequence in sequences: continue
+            # Add to MSA #
+            msa.append((header, sequence))
+            sequences.setdefault(sequence, header)
+        # For header, sequence... #
+        for header, sequence in msa:
+            # Write #
+            write(famsa_in_file, ">%s\n%s" % (header, sequence))
+    # Skip if FAMSA output file already exists #
+    famsa_out_file = os.path.join(os.path.abspath(options.output_dir), "famsa.out.fa")
+    if not os.path.exists(famsa_out_file):
+        # Create MSA #
+        process = subprocess.check_output(["famsa", "-t", "32", hmmalign_in_hmm, hmmalign_in_file])
+
+    #----------#
+    # MSAs     #
+    #----------#
+
+    # Skip if MSA file already exists #
+    hmmalign_msa_file = os.path.join(os.path.abspath(options.output_dir), "msa.hmmalign.fa")
+    if not os.path.exists(hmmer_msa_file):
         # Initialize #
         uniq = set()
         headers = []
@@ -270,6 +309,35 @@ if __name__ == "__main__":
             sequence = "".join(sequences[i])
             if sequence not in uniq:
                 # Write #
-                write(msa_file, ">%s\n%s" % (headers[i], sequence))
+                write(hmmalign_msa_file, ">%s\n%s" % (headers[i], sequence))
+                # Sequence is unique #
+                uniq.add(sequence)
+    # Skip if MSA file already exists #
+    famsa_msa_file = os.path.join(os.path.abspath(options.output_dir), "msa.famsa.fa")
+    if not os.path.exists(famsa_msa_file):
+        # Initialize #
+        uniq = set()
+        headers = []
+        sequences = []
+        # For header, sequence... #
+        for header, sequence in parse_fasta_file(famsa_out_file, clean=False):
+            # Add to lists #
+            headers.append(header)
+            sequences.append(list(sequence))
+        # Transpose sequences #
+        sequences = zip(*sequences)
+        # For each position... #
+        for i in reversed(range(len(sequences))):
+            # If query position is a gap... #
+            if sequences[i][0] == "-": sequences.pop(i)
+        # Transpose sequences #
+        sequences = zip(*sequences)
+        # For each sequence... #
+        for i in range(len(headers)):
+            # If sequence is unique... #
+            sequence = "".join(sequences[i])
+            if sequence not in uniq:
+                # Write #
+                write(famsa_msa_file, ">%s\n%s" % (headers[i], sequence))
                 # Sequence is unique #
                 uniq.add(sequence)
