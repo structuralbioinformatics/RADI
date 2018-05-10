@@ -267,7 +267,7 @@ if __name__ == "__main__":
         # For each sequence... #
         for i in range(len(headers)):
             # If sequence is unique... #
-            sequence "".join(sequences[i])
+            sequence = "".join(sequences[i])
             if sequence not in uniq:
                 # Write #
                 write(msa_file, ">%s\n%s" % (headers[i], sequence))
