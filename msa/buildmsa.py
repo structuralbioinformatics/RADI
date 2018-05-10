@@ -235,30 +235,35 @@ if __name__ == "__main__":
         # Create HMM #
         process = subprocess.check_output(["hmmbuild", hmmalign_in_hmm, clustalo_out_file]) 
     # Skip if HMMER output file already exists #
-    hmmalign_out_hmm = os.path.join(os.path.abspath(options.output_dir), "hmmalign.out.sto")
-    if not os.path.exists(hmmalign_out_hmm):
+    hmmalign_out_file = os.path.join(os.path.abspath(options.output_dir), "hmmalign.out.sto")
+    if not os.path.exists(hmmalign_out_file):
         # Create MSA #
-        process = subprocess.check_output(["hmmalign", "--mapali", clustalo_out_file, "-o", hmmalign_out_hmm, "--trim", hmmalign_in_hmm, hmmalign_in_file])
+        process = subprocess.check_output(["hmmalign", "--mapali", clustalo_out_file, "-o", hmmalign_out_file, "--trim", hmmalign_in_hmm, hmmalign_in_file])
+    # Skip if FASTA reformatted HMMER output already exists #
+    hmmalign_out_fas = os.path.join(os.path.abspath(options.output_dir), "hmmalign.out.fas")
+    if not os.path.exists(hmmalign_out_fas):
+        # Create MSA #
+        process = subprocess.check_output([os.path.join(os.path.dirname(os.path.realpath(__file__)), "reformat.pl"), hmmalign_out_file, hmmalign_out_fas])
 
-#    msa_file = os.path.join(os.path.abspath(options.output_dir), "msa.fa")
-#    if not os.path.exists(msa_file):
-#        # Initialize #
-#        headers = []
-#        sequences = []
-#        # For header, sequence... #
-#        for header, sequence in parse_fasta_file(famsa_out_file, clean=False):
-#            # Add to lists #
-#            headers.append(header)
-#            sequences.append(list(sequence))
-#        # Transpose sequences #
-#        sequences = zip(*sequences)
-#        # For each position... #
-#        for i in reversed(range(len(sequences))):
-#            # If query position is a gap... #
-#            if sequences[i][0] == "-": sequences.pop(i)
-#        # Transpose sequences #
-#        sequences = zip(*sequences)
-#        # For each sequence... #
-#        for i in range(len(headers)):
-#            # Write #
-#            write(msa_file, ">%s\n%s" % (headers[i], "".join(sequences[i])))
+    msa_file = os.path.join(os.path.abspath(options.output_dir), "msa.fa")
+    if not os.path.exists(msa_file):
+        # Initialize #
+        headers = []
+        sequences = []
+        # For header, sequence... #
+        for header, sequence in parse_fasta_file(hmmalign_out_fas, clean=False):
+            # Add to lists #
+            headers.append(header)
+            sequences.append(list(sequence))
+        # Transpose sequences #
+        sequences = zip(*sequences)
+        # For each position... #
+        for i in reversed(range(len(sequences))):
+            # If query position is a gap... #
+            if sequences[i][0] == "-": sequences.pop(i)
+        # Transpose sequences #
+        sequences = zip(*sequences)
+        # For each sequence... #
+        for i in range(len(headers)):
+            # Write #
+            write(msa_file, ">%s\n%s" % (headers[i], "".join(sequences[i])))
