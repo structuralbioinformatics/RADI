@@ -215,6 +215,24 @@ int main(int argc, char *argv[])
           cmap_cb  = contact_map(protein,(int)GAP,type,(double)THRESHOLD_CB,contact_cb,verbose);
 	  type="MIN";
           cmap_min = contact_map(protein,(int)GAP,type,(double)THRESHOLD_MIN,contact_min,verbose);
+        }else{
+          nr=L;
+          contact_ca =(double**) malloc((nr+1)*sizeof(double*));
+          contact_cb =(double**) malloc((nr+1)*sizeof(double*));
+          contact_min=(double**) malloc((nr+1)*sizeof(double*));
+          for (i=0; i<=nr; i++){contact_ca[i]=(double*) calloc((nr+1),sizeof(double));}
+          for (i=0; i<=nr; i++){contact_cb[i]=(double*) calloc((nr+1),sizeof(double));}
+          for (i=0; i<=nr; i++){contact_min[i]=(double*) calloc((nr+1),sizeof(double));}
+          cmap_ca =(int**) malloc((nr+1)*sizeof(int*));
+          cmap_cb =(int**) malloc((nr+1)*sizeof(int*));
+          cmap_min=(int**) malloc((nr+1)*sizeof(int*));
+          for (i=0; i<=nr; i++){cmap_ca[i]=(int*) calloc((nr+1),sizeof(int));}
+          for (i=0; i<=nr; i++){cmap_cb[i]=(int*) calloc((nr+1),sizeof(int));}
+          for (i=0; i<=nr; i++){cmap_min[i]=(int*) calloc((nr+1),sizeof(int));}
+          for (i=0; i<=nr; i++){for (j=0; j<=nr; j++){contact_ca[i][j]=-1.;contact_cb[i][j]=-1.;contact_min[i][j]=-1.;}}
+          for (i=0; i<=nr; i++){for (j=i-1;j<=i+1; j++){if (j>0 && j<=nr) {contact_ca[i][j]=5.0;contact_cb[i][j]=5.0;contact_min[i][j]=5.0;}}}
+          for (i=0; i<=nr; i++){for (j=0; j<=nr; j++){cmap_ca[i][j]=0;cmap_cb[i][j]=0;cmap_min[i][j]=0;}}
+          for (i=0; i<=nr; i++){for (j=i-1;j<=i+1; j++){if (j>0 && j<=nr) {cmap_ca[i][j]=1;cmap_cb[i][j]=1;cmap_min[i][j]=1;}}}
         }
 
 
@@ -273,22 +291,24 @@ int main(int argc, char *argv[])
 
 
 //Free memory
-	if (PDB_File!=NULL){
-          for (i=0; i<=protein.number_of_res; i++){
+
+        if (verbose) printf("Clean Memory %d\n",nr);
+
+        for (i=0; i<=nr; i++){
 	    free(cmap_ca[i]);
 	    free(cmap_cb[i]);
 	    free(cmap_min[i]);
-	  }
-	  for (i=0; i<=protein.number_of_res;i++) free(contact_ca[i]);
-	  for (i=0; i<=protein.number_of_res;i++) free(contact_cb[i]);
-	  for (i=0; i<=protein.number_of_res;i++) free(contact_min[i]);
-  	  free(cmap_ca);
-	  free(cmap_cb);
-	  free(cmap_min);
-	  free(contact_ca);
-	  free(contact_cb);
-	  free(contact_min);
 	}
+	for (i=0; i<=nr;i++) free(contact_ca[i]);
+	for (i=0; i<=nr;i++) free(contact_cb[i]);
+	for (i=0; i<=nr;i++) free(contact_min[i]);
+  	free(cmap_ca);
+	free(cmap_cb);
+	free(cmap_min);
+	free(contact_ca);
+	free(contact_cb);
+	free(contact_min);
+
 	for (i=0; i<l; i++){
           free(DI[i]);
           free(MI[i]);

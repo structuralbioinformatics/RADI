@@ -27,7 +27,7 @@ char *gnu_gif,*cmap_filename,*cmap_off_filename,*MI_top_filename,*DI_top_filenam
 {
 
  FILE *DI_File,*DI_top_File,*MI_top_File,*cmap_File,*cmap_offFile,*gnu_File;
- int  i,j,k,n_index,ss_i,ss_j,rank,index_mi,index_di,swap,print_return,max_rank_mi,max_rank_di,i_mi,j_mi,i_di,j_di,nt_core,ct_core;
+ int  i,j,k,n_index,ss_i,ss_j,rank,index_mi,index_di,swap,print_return,max_rank_mi,max_rank_di,i_mi,j_mi,i_di,j_di,nt_core,ct_core,toprank;
  int *di_rank,*mi_rank,*j_index,*i_index;
  int tp_mi_ca,tp_mi_cb,tp_mi_min,tp_mi_sum,tp_di_ca,tp_di_cb,tp_di_min,tp_di_sum;
  int fp_mi_ca,fp_mi_cb,fp_mi_min,fp_mi_sum,fp_di_ca,fp_di_cb,fp_di_min,fp_di_sum;
@@ -43,38 +43,36 @@ char *gnu_gif,*cmap_filename,*cmap_off_filename,*MI_top_filename,*DI_top_filenam
 		printf("--Problems opening the OUTPUT file %s\n",DI_filename);
 		exit(2);
                 }
-        if (PDB_File!=NULL){
-          MI_top_File = NULL;
-          DI_top_File = NULL;
-          cmap_File   = NULL;
-          cmap_offFile= NULL;
-          gnu_File    = NULL;
-	  DI_top_File = fopen(DI_top_filename, "w");
-	  MI_top_File = fopen(MI_top_filename, "w");
-	  cmap_File   = fopen(cmap_filename, "w");
-	  cmap_offFile= fopen(cmap_off_filename, "w");
-          gnu_File    = fopen(gnu_filename, "w");
-          if (DI_top_File == NULL){
+        MI_top_File = NULL;
+        DI_top_File = NULL;
+        cmap_File   = NULL;
+        cmap_offFile= NULL;
+        gnu_File    = NULL;
+	DI_top_File = fopen(DI_top_filename, "w");
+	MI_top_File = fopen(MI_top_filename, "w");
+	cmap_File   = fopen(cmap_filename, "w");
+	cmap_offFile= fopen(cmap_off_filename, "w");
+        gnu_File    = fopen(gnu_filename, "w");
+        if (DI_top_File == NULL){
 		printf("--Problems opening the OUTPUT file %s\n",DI_top_filename);
 		exit(2);
                 }
-          if (MI_top_File == NULL){
+        if (MI_top_File == NULL){
 		printf("--Problems opening the OUTPUT file %s\n",MI_top_filename);
 		exit(2);
                 }
-          if (cmap_File == NULL){
+        if (cmap_File == NULL){
 		printf("--Problems opening the OUTPUT file %s\n",cmap_filename);
 		exit(2);
                 }
-          if (cmap_offFile == NULL){
+        if (cmap_offFile == NULL){
 		printf("--Problems opening the OUTPUT file %s\n",cmap_off_filename);
 		exit(2);
                 }
-          if (gnu_File == NULL){
+        if (gnu_File == NULL){
 		printf("--Problems opening the OUTPUT file %s\n",gnu_filename);
 		exit(2);
                 }
-        }
 
 //Reorder by MI and DI
 //      Calculate size
@@ -107,26 +105,27 @@ char *gnu_gif,*cmap_filename,*cmap_off_filename,*MI_top_filename,*DI_top_filenam
         max_rank_di=RankOrder(minimum_gap,fragment_size,l,n_index,pos,DI,SSA,di_rank,i_index,j_index,di_index,DI_order);
 	if (verbose) printf("\t-- Maximum number of DI %d\n",max_rank_di);
 
-        if (PDB_File!=NULL){
 //Analyses
+        if (fmin(max_rank_di,max_rank_mi)<TOPRANK) {toprank=fmin(max_rank_di,max_rank_mi)/2;}else{toprank=TOPRANK;}
+        if (verbose) printf("\t-- TOPRANK  %d\n",toprank);
 // TP vs FP (%PPV)
-         tp_mi_ca =0;
-         tp_mi_cb =0;
-         tp_mi_min=0;
-         tp_mi_sum=0;
-         fp_mi_ca =0;
-         fp_mi_cb =0;
-         fp_mi_min=0;
-         fp_mi_sum=0;
-         tp_di_ca =0;
-         tp_di_cb =0;
-         tp_di_min=0;
-         tp_di_sum=0;
-         fp_di_ca =0;
-         fp_di_cb =0;
-         fp_di_min=0;
-         fp_di_sum=0;
-         for (rank=1;rank<=TOPRANK;rank++){
+        tp_mi_ca =0;
+        tp_mi_cb =0;
+        tp_mi_min=0;
+        tp_mi_sum=0;
+        fp_mi_ca =0;
+        fp_mi_cb =0;
+        fp_mi_min=0;
+        fp_mi_sum=0;
+        tp_di_ca =0;
+        tp_di_cb =0;
+        tp_di_min=0;
+        tp_di_sum=0;
+        fp_di_ca =0;
+        fp_di_cb =0;
+        fp_di_min=0;
+        fp_di_sum=0;
+        for (rank=1;rank<=toprank;rank++){
             index_di = (int)di_index[di_rank[rank]];
             index_mi = (int)mi_index[mi_rank[rank]];
             i_mi     = i_index[index_mi];
@@ -145,22 +144,22 @@ char *gnu_gif,*cmap_filename,*cmap_off_filename,*MI_top_filename,*DI_top_filenam
 	    if (   NearestContact(xpos[pos[i_di]],xpos[pos[j_di]],fragment_size,L,contact_ca) < (double)THRESHOLD_CA
                 || NearestContact(xpos[pos[i_di]],xpos[pos[j_di]],fragment_size,L,contact_cb) < (double)THRESHOLD_CB
                 || NearestContact(xpos[pos[i_di]],xpos[pos[j_di]],fragment_size,L,contact_min) < (double)THRESHOLD_MIN){tp_di_sum++;}else{fp_di_sum++;}
-         }
-         if (verbose) printf("\t-- Successes on MI: %d\n",tp_mi_sum);
-         if (verbose) printf("\t-- Successes on DI: %d\n",tp_di_sum);
+        }
+        if (verbose) printf("\t-- Successes on MI: %d\n",tp_mi_sum);
+        if (verbose) printf("\t-- Successes on DI: %d\n",tp_di_sum);
 
 //Plot
-         fprintf(cmap_File,"#pos1\tpos2\tradius\n");
-         fprintf(cmap_offFile,"#pos1\tpos2\tradius\n");
-         fprintf(MI_top_File,"#pos1\tpos2\n");
-         fprintf(DI_top_File,"#pos1\tpos2\n");
-         nt_core=L;
-         ct_core=1;
-         for (k=0;k<l;k++){ if (xpos[pos[k]] > ct_core) ct_core=xpos[pos[k]];}
-         for (k=0;k<l;k++){ if (xpos[pos[k]] < nt_core) nt_core=xpos[pos[k]];}
-         for (i=1; i<=nr; i++){
-         for (j=i+1; j<=nr; j++){
-         if  (cmap_ca[i][j] == 1 || cmap_cb[i][j] == 1  || cmap_min[i][j] == 1) {
+        fprintf(cmap_File,"#pos1\tpos2\tradius\n");
+        fprintf(cmap_offFile,"#pos1\tpos2\tradius\n");
+        fprintf(MI_top_File,"#pos1\tpos2\n");
+        fprintf(DI_top_File,"#pos1\tpos2\n");
+        nt_core=L;
+        ct_core=1;
+        for (k=0;k<l;k++){ if (xpos[pos[k]] > ct_core) ct_core=xpos[pos[k]];}
+        for (k=0;k<l;k++){ if (xpos[pos[k]] < nt_core) nt_core=xpos[pos[k]];}
+        for (i=1; i<=nr; i++){
+        for (j=i+1; j<=nr; j++){
+        if  (cmap_ca[i][j] == 1 || cmap_cb[i][j] == 1  || cmap_min[i][j] == 1) {
              fprintf(cmap_File,"%3d\t%3d\t%3d\n",i,j,2);
              fprintf(cmap_File,"%3d\t%3d\t%3d\n",j,i,2);
              if (i<nt_core || j<nt_core){ 
@@ -171,10 +170,10 @@ char *gnu_gif,*cmap_filename,*cmap_off_filename,*MI_top_filename,*DI_top_filenam
               fprintf(cmap_offFile,"%3d\t%3d\t%3d\n",i,j,2);
               fprintf(cmap_offFile,"%3d\t%3d\t%3d\n",j,i,2);
              }
-         }}}
-	 fflush(cmap_File);
-	 fflush(cmap_offFile);
-         for (rank=1;rank<=TOPRANK;rank++){
+        }}}
+        fflush(cmap_File);
+        fflush(cmap_offFile);
+        for (rank=1;rank<=toprank;rank++){
             index_mi = (int)mi_index[mi_rank[rank]];
             i_mi     = i_index[index_mi];
             j_mi     = j_index[index_mi];
@@ -183,17 +182,15 @@ char *gnu_gif,*cmap_filename,*cmap_off_filename,*MI_top_filename,*DI_top_filenam
             i_di     = i_index[index_di];
             j_di     = j_index[index_di];
             if (xpos[pos[i_mi]]>xpos[pos[j_mi]]){fprintf(DI_top_File,"%3d\t%3d\n",xpos[pos[i_di]],xpos[pos[j_di]]);}else{fprintf(DI_top_File,"%3d\t%3d\n",xpos[pos[j_di]],xpos[pos[i_di]]);}
-         }
-	 fflush(MI_top_File);
-	 fflush(DI_top_File);
-         fprintf(gnu_File,"set term gif\n");
-         fprintf(gnu_File,"set xrange [0:]\n");
-         fprintf(gnu_File,"set yrange [0:]\n");
-         fprintf(gnu_File,"set style fill transparent solid 0.5 noborder\n");
-         fprintf(gnu_File,"set output '%s' \n",gnu_gif);
-         fprintf(gnu_File,"plot '%s' using 1:2:(sqrt($3)) title 'Close contacts' with circles lc rgb 'gray', '%s' title 'MI' lt rgb 'red', '%s' title 'DI' lt rgb 'blue', '%s' using 1:2:(sqrt($3)) title 'Off-side contacts' with circles lc rgb '#FFC0CB'\n", cmap_filename , MI_top_filename, DI_top_filename,cmap_off_filename );
-//End analyses when we have a PDB file
         }
+	fflush(MI_top_File);
+	fflush(DI_top_File);
+        fprintf(gnu_File,"set term gif\n");
+        fprintf(gnu_File,"set xrange [0:]\n");
+        fprintf(gnu_File,"set yrange [0:]\n");
+        fprintf(gnu_File,"set style fill transparent solid 0.5 noborder\n");
+        fprintf(gnu_File,"set output '%s' \n",gnu_gif);
+        fprintf(gnu_File,"plot '%s' using 1:2:(sqrt($3)) title 'Close contacts' with circles lc rgb 'gray', '%s' title 'MI' lt rgb 'red', '%s' title 'DI' lt rgb 'blue', '%s' using 1:2:(sqrt($3)) title 'Off-side contacts' with circles lc rgb '#FFC0CB'\n", cmap_filename , MI_top_filename, DI_top_filename,cmap_off_filename );
  
 
 //Write Output
@@ -259,13 +256,11 @@ char *gnu_gif,*cmap_filename,*cmap_off_filename,*MI_top_filename,*DI_top_filenam
 
 //Close files
         fclose(DI_File);
-        if (PDB_File!=NULL){
-         fclose(cmap_File);
-         fclose(cmap_offFile);
-	 fclose(gnu_File);
-         fclose(MI_top_File);
-         fclose(DI_top_File);
-	}
+        fclose(cmap_File);
+        fclose(cmap_offFile);
+	fclose(gnu_File);
+        fclose(MI_top_File);
+        fclose(DI_top_File);
 
 //Free memory
 
