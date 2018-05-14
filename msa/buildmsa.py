@@ -175,6 +175,8 @@ if __name__ == "__main__":
         # Get FASTA sequences #
         process = subprocess.check_output(["mmseqs", "createseqfiledb", db, alignment_file, sequences_file])
 
+    exit(0)
+
     #----------#
     # ClustalO #
     #----------#
