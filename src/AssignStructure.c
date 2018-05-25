@@ -18,7 +18,7 @@ int  L,verbose;
     ss_sequence  = (char**) malloc(2*sizeof(char*));
     if (ss_sequence == NULL){ printf("It was not possible to allocate memory\n"); exit(1); }
     for (i=0; i<2; i++){
-        ss_sequence[i] = (char*) calloc(L,sizeof(char));
+        ss_sequence[i] = (char*) calloc(L+1,sizeof(char));
         if (ss_sequence[i] == NULL){ 
              printf("Not enough memory to allocate MSA\n"); 
              exit(1);
@@ -84,9 +84,9 @@ int  L,verbose;
     }
 
 // Free memory
+    free(line);
     for (i=0; i<2; i++){ free(ss_sequence[i]);}
     free(ss_sequence);
-    free(line);
 
 //Report verbose
     if (verbose){
