@@ -188,9 +188,10 @@ if __name__ == "__main__":
         for header, sequence in parse_fasta_file(os.path.abspath(options.input_file)):
             # Add sequence #
             sequences.setdefault(sequence, header)
-            break
         # For header, sequence... #
         for header, sequence in parse_fasta_file(nr_sequences_file):
+            # Skip if enough sequences #
+            if len(sequences) == options.max_sequences: break
             # Skip if sequence already exists #
             if sequence in sequences: continue
             sequences.setdefault(sequence, header)
