@@ -175,8 +175,6 @@ if __name__ == "__main__":
         # Get FASTA sequences #
         process = subprocess.check_output(["mmseqs", "createseqfiledb", db, alignment_file, sequences_file])
 
-    exit(0)
-
     #----------#
     # ClustalO #
     #----------#
@@ -185,25 +183,21 @@ if __name__ == "__main__":
     clustalo_in_file = os.path.join(os.path.abspath(options.output_dir), "clustalo.in.fa")
     if not os.path.exists(clustalo_in_file):
         # Initialize #
-        msa = []
         sequences = {}
         # For header, sequence... #
         for header, sequence in parse_fasta_file(os.path.abspath(options.input_file)):
-            # Add to MSA #
-            msa.append((header, sequence))
+            # Add sequence #
             sequences.setdefault(sequence, header)
             break
         # For header, sequence... #
         for header, sequence in parse_fasta_file(nr_sequences_file):
             # Skip if sequence already exists #
             if sequence in sequences: continue
-            # Add to MSA #
-            msa.append((header, sequence))
             sequences.setdefault(sequence, header)
-        # For header, sequence... #
-        for header, sequence in msa:
+        # For each sequence... #
+        for sequence in sequences:
             # Write #
-            write(clustalo_in_file, ">%s\n%s" % (header, sequence))
+            write(clustalo_in_file, ">%s\n%s" % (sequences[sequence], sequence))
     # Skip if ClustalO output file already exists #
     clustalo_out_file = os.path.join(os.path.abspath(options.output_dir), "clustalo.out.fa")
     if not os.path.exists(clustalo_out_file):
@@ -218,19 +212,24 @@ if __name__ == "__main__":
     hmmalign_in_file = os.path.join(os.path.abspath(options.output_dir), "hmmalign.in.fa")
     if not os.path.exists(hmmalign_in_file):
         # Initialize #
-        msa = []
+        msa_sequences = {}
         sequences = {}
         # For header, sequence... #
-        for header, sequence in parse_fasta_file(sequences_file):
-            # Skip if sequence already exists #
-            if sequence in sequences: continue
-            # Add to MSA #
-            msa.append((header, sequence))
-            sequences.setdefault(sequence, header)
+        for header, sequence in parse_fasta_file(clustalo_in_file):
+            # Add sequence #
+            msa_sequences.setdefault(sequence, header)
         # For header, sequence... #
-        for header, sequence in msa:
+        for header, sequence in parse_fasta_file(sequences_file):
+            # Skip if enough sequences #
+            if len(msa_sequences) + len(sequences) == options.max_sequences: break
+            # Skip if sequence already exists #
+            if sequence in msa_sequences: continue
+            if sequence in sequences: continue
+            sequences.setdefault(sequence, header)
+        # For each sequence... #
+        for sequence in sequences:
             # Write #
-            write(hmmalign_in_file, ">%s\n%s" % (header, sequence))
+            write(hmmalign_in_file, ">%s\n%s" % (sequences[sequence], sequence))
     # Skip if HMMalign input hmm already exists #
     hmmalign_in_hmm = os.path.join(os.path.abspath(options.output_dir), "hmmalign.in.hmm")
     if not os.path.exists(hmmalign_in_hmm):
@@ -255,26 +254,25 @@ if __name__ == "__main__":
     famsa_in_file = os.path.join(os.path.abspath(options.output_dir), "famsa.in.fa")
     if not os.path.exists(famsa_in_file):
         # Initialize #
-        msa = []
         sequences = {}
         # For header, sequence... #
         for header, sequence in parse_fasta_file(clustalo_in_file):
+            # Skip if enough sequences #
+            if len(sequences) == options.max_sequences: break
             # Skip if sequence already exists #
             if sequence in sequences: continue
-            # Add to MSA #
-            msa.append((header, sequence))
             sequences.setdefault(sequence, header)
         # For header, sequence... #
         for header, sequence in parse_fasta_file(hmmalign_in_file):
+            # Skip if enough sequences #
+            if len(sequences) == options.max_sequences: break
             # Skip if sequence already exists #
             if sequence in sequences: continue
-            # Add to MSA #
-            msa.append((header, sequence))
             sequences.setdefault(sequence, header)
-        # For header, sequence... #
-        for header, sequence in msa:
+        # For each sequence... #
+        for sequence in sequences:
             # Write #
-            write(famsa_in_file, ">%s\n%s" % (header, sequence))
+            write(famsa_in_file, ">%s\n%s" % (sequences[sequence], sequence))
     # Skip if FAMSA output file already exists #
     famsa_out_file = os.path.join(os.path.abspath(options.output_dir), "famsa.out.fa")
     if not os.path.exists(famsa_out_file):
