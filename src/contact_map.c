@@ -49,7 +49,7 @@ double cutoff,**d;
       if (strcmp(prot.atoms_of_prot[i].chain,prot.atoms_of_prot[i+1].chain)){
                  nc[ic]=prot.atoms_of_prot[i].res_number;
                  ic++;
-                 if (ic==MAXCHAIN){printf("Too many chains: %s vs %s in residue %d\n",prot.atoms_of_prot[i],prot.atoms_of_prot[i+1].chain,prot.atoms_of_prot[i].res_number);exit(0);}
+                 if (ic==MAXCHAIN){printf("Too many chains: %s vs %s in residue %d\n",prot.atoms_of_prot[i].chain,prot.atoms_of_prot[i+1].chain,prot.atoms_of_prot[i].res_number);exit(0);}
       }}
       for (j=i+1;j<prot.number_of_atoms;j++){
 	n=prot.atoms_of_prot[i].res_number;
