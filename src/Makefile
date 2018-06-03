@@ -32,6 +32,7 @@ LIBS =  -lm -fstack-protector-all
 
 raDI: $(OBJS)
 	$(C) -o raDI $(OBJS) $(LIBS) -g $(OPT)
+	cp raDI ../bin
 clean:
 	\rm *.o
 
