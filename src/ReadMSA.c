@@ -3,7 +3,7 @@
 char **ReadMSA( MSA_File,numseqs, ra_cluster,L, mini_aa,aa,q,swap,verbose )
 FILE *MSA_File;
 char *mini_aa,*aa;
-int  numseqs, L,ra_cluster,q,swap,verbose; 
+int  numseqs, L,ra_cluster,q,swap,verbose;
 {
   int  i,j,k,A,aux;
   char *line,**MSA;
@@ -97,12 +97,12 @@ int  numseqs, L,ra_cluster,q,swap,verbose;
 
 				}
                                 if (swap == 1){
-                                  if (line[j] == '-' || line[j] == '0' || aux == 3){ 
+                                  if (line[j] == '-' || line[j] == '0' || aux == 3){
                                      MSA[k][i] = (char) line[j];
                                    }else{
                                      MSA[k][i] = rnd_aa(q,aa,(char) line[j]);
                                    }
-                                }else{ 
+                                }else{
                                    MSA[k][i] = (char) line[j];
                                 }
 				i++;
@@ -111,35 +111,34 @@ int  numseqs, L,ra_cluster,q,swap,verbose;
 		}
 	}
 	free(line);
- 
+
         return MSA;
 
 }
 
 
-char   rnd_aa(q,aa,test)
-int  q;
-char *aa, test;
-{
- int   i,k,r,qq;
- char  *aar,result;
- clock_t time();
+char rnd_aa(int q, char *aa, char test) {
+  int   i, k, r, qq;
+  char  *aar, result;
+  time_t time();
 
- srand(time(NULL));  
+  srand(time(NULL));
 
- aar =  (char*) malloc(q*sizeof(char));
- qq=0;
- for (i=1;i<q;i++){
-     if (aa[i] != test){ aar[qq]=aa[i];qq++;}
-     }
+  aar = (char*) malloc(q*sizeof(char));
+  qq = 0;
+  for (i=1; i<q; i++){
+    if (aa[i] != test){
+      aar[qq] = aa[i];
+      qq++;
+    }
+  }
 
- r = rand();
- k = r % (qq);
- result = aar[k];
- free( aar);
+  r = rand();
+  k = r % (qq);
+  result = aar[k];
+  free( aar);
 
- return result;
-
+  return result;
 }
 
 
