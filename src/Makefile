@@ -2,7 +2,7 @@
 # bash: ulimit -s unlimited
 # csh:  limit  stacksize unlimited
 C    = gcc
-OPT  =	-g -O3  -fexpensive-optimizations
+OPT  = -O3
 OBJS = AssignStructure.o \
        AssignNumberInStructure.o\
        EffectiveCounts.o \
@@ -24,14 +24,15 @@ OBJS = AssignStructure.o \
        GetSeedSequence.o \
        raDI.o
 
-LIBS =  -lm -fstack-protector-all 
-  
+LIBS =  -lm -fstack-protector-all
+
 .SUFFIXES: .c .o
 .c.o:
-	$(C) -c -O3  -fexpensive-optimizations $*.c 
+	$(C) -c $(OPT) $*.c
 
-raDI: $(OBJS) 
-	$(C) -o raDI  $(OBJS)  $(LIBS) $(OPT)
+raDI: $(OBJS)
+	$(C) -o raDI $(OBJS) $(LIBS) -g $(OPT)
+	cp raDI ../bin
 clean:
-	\rm *.o 
+	\rm *.o
 
