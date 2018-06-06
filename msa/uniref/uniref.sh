@@ -5,7 +5,7 @@ mmseqs createdb uniref50.fasta uniref100.db
 mmseqs createindex uniref50.db tmp
 curl -O ftp://ftp.uniprot.org/pub/databases/uniprot/uniref/uniref90/uniref90.fasta.gz
 gunzip uniref90.fasta.gz
-mmseqs createdb uniref90.fasta uniref100.db
+mmseqs createdb uniref90.fasta uniref90.db
 mmseqs createindex uniref90.db tmp
 curl -O ftp://ftp.uniprot.org/pub/databases/uniprot/uniref/uniref100/uniref100.fasta.gz
 gunzip uniref100.fasta.gz

@@ -130,8 +130,8 @@ if __name__ == "__main__":
     options = parse_options()
 
     # Initialize #
-    nr_db = os.path.join(uniref_path, "%s.db" % options.nr_db)
-    db = os.path.join(uniref_path, "%s.db" % options.db)
+    nr_db = os.path.join(uniref_path, "%s.fa.db" % options.nr_db)
+    db = os.path.join(uniref_path, "%s.fa.db" % options.db)
     dummy_dir = os.path.abspath(options.dummy_dir)
     # Create output dir #
     if not os.path.exists(os.path.abspath(options.output_dir)):
