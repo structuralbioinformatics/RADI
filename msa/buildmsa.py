@@ -1,13 +1,44 @@
+#!/usr/bin/env python2.7
 import os, sys, re
 import optparse
 import subprocess
 
-# i.e. directory where uniref.sh was exec
-uniref_path = "/home/ofornes/RADI/msa/uniref"
+#-------------#
+# Functions   #
+#-------------#
 
-#-------------#
-# Parsers     #
-#-------------#
+def parse_options():
+    """
+    This function parses the command line arguments and returns an optparse
+    object.
+
+    """
+
+    parser = optparse.OptionParser("./%prog -f <famsa_dir> -i <input_file> -m <mmseqs_dir> -u <uniref_dir> [-n <nr_db> -r <db>] [--dummy=<dummy_dir> -o <output_dir> -s <max_sequences> -t <threads>")
+
+    parser.add_option("-f", action="store", type="string", dest="famsa_dir", help="Full path to FAMSA bin directory (i.e. where \"famsa\" is located; e.g. $FAMSA_PATH/bin)", metavar="<famsa_dir>")
+    parser.add_option("-i", action="store", type="string", dest="input_file", help="Input file (in FASTA format)", metavar="<input_file>")
+    parser.add_option("-m", action="store", type="string", dest="mmseqs_dir", help="Full path to MMseqs2 bin directory (i.e. where \"mmseqs\" is located; e.g. $MMSEQS2_PATH/bin)", metavar="<mmseqs_dir>")
+    parser.add_option("-u", action="store", type="string", dest="uniref_dir", help="UniRef DB directory (i.e. where uniref.sh was executed)", metavar="<uniref_dir>")
+
+    group = optparse.OptionGroup(parser, "UniRef DB options", "The script will build a profile of the query by searching the non-redundant DB (default = \"uniref50\") with MMseqs2 for 4 iterations, after which it will switch to searching the redundant DB (default = \"uniref100\") with that profile.")
+    group.add_option("-n", action="store", default="uniref50", type="string", dest="nr_db", help="Non-redundant UniRef DB (\"uniref50\", \"uniref90\" or \"uniref100\"; default = uniref50)", metavar="<nr_db>")
+    group.add_option("-r", action="store", default="uniref100", type="string", dest="db", help="Redundant UniRef DB (\"uniref50\", \"uniref90\" or \"uniref100\"; default = uniref100)", metavar="<db>")
+    parser.add_option_group(group)
+
+    group = optparse.OptionGroup(parser, "Non-mandatory options")
+    group.add_option("--dummy", default="/tmp/", action="store", type="string", dest="dummy_dir", help="Dummy directory (default = /tmp/)", metavar="<dummy_dir>")
+    group.add_option("-o", action="store", default="./", type="string", dest="output_dir", help="Output directory (default = ./)", metavar="<output_dir>")
+    group.add_option("-s", action="store", default=100000, type="int", dest="max_sequences", help="Max. number of sequences (default = 100000)", metavar="<max_sequences>")
+    group.add_option("-t", "--threads", default=1, action="store", type="int", dest="threads", help="Total number of cores to be used for the computation (default = 1)", metavar="<threads>")
+    parser.add_option_group(group)
+
+    (options, args) = parser.parse_args()
+
+    if options.input_file is None:
+        parser.error("missing arguments: type option \"-h\" for help")
+
+    return options
 
 def parse_file(file_name):
     """
@@ -68,10 +99,6 @@ def parse_fasta_file(file_name, clean=True):
 
     yield header, sequence
 
-#-------------#
-# Write       #
-#-------------#
-
 def write(file_name=None, content=""):
     """
     This function writes any {content} to a file or to stdout if no
@@ -93,34 +120,6 @@ def write(file_name=None, content=""):
         sys.stdout.write("%s\n" % content)
 
 #-------------#
-# Functions   #
-#-------------#
-
-def parse_options():
-    """
-    This function parses the command line arguments and returns an optparse
-    object.
-
-    """
-
-    parser = optparse.OptionParser("python2.7 %prog -i <input_file> [--dummy=dummy_dir -n <nr_database> -r <db> -o <output_dir> -s <max_sequences> -u <uniref_dir>]")
-
-    parser.add_option("--dummy", default="/tmp/", action="store", type="string", dest="dummy_dir", help="Dummy directory (default = /tmp/)", metavar="<dummy_dir>")
-    parser.add_option("-i", action="store", type="string", dest="input_file", help="Input file (in FASTA format)", metavar="<input_file>")
-    parser.add_option("-n", action="store", default="uniref50", type="string", dest="nr_db", help="Non-redundant database (\"uniref50\", \"uniref90\" or \"uniref100\"; default=uniref50)", metavar="<nr_db>")
-    parser.add_option("-o", action="store", default="./", type="string", dest="output_dir", help="Output directory (default = ./)", metavar="<output_dir>")
-    parser.add_option("-r", action="store", default="uniref100", type="string", dest="db", help="Redundant database (\"uniref50\", \"uniref90\" or \"uniref100\"; default=uniref100)", metavar="<db>")
-    parser.add_option("-s", action="store", default=1000000, type="int", dest="max_sequences", help="Max. number of sequences (default=1000000)", metavar="<max_sequences>")
-    parser.add_option("-u", action="store", type="string", dest="uniref_dir", help="UniRef directory (i.e. where uniref.sh was exec)", metavar="<uniref_dir>")
-
-    (options, args) = parser.parse_args()
-
-    if options.input_file is None:
-        parser.error("missing arguments: type option \"-h\" for help")
-
-    return options
-
-#-------------#
 # Main        #
 #-------------#
 
@@ -130,20 +129,20 @@ if __name__ == "__main__":
     options = parse_options()
 
     # Initialize #
-    nr_db = os.path.join(uniref_path, "%s.fa.db" % options.nr_db)
-    db = os.path.join(uniref_path, "%s.fa.db" % options.db)
-    dummy_dir = os.path.abspath(options.dummy_dir)
+    nr_db = os.path.join(os.path.abspath(options.uniref_dir), "%s.fa.db" % options.nr_db)
+    db = os.path.join(os.path.abspath(options.uniref_dir), "%s.fa.db" % options.db)
+    # Create dummy dir #
+    dummy_dir = os.path.join(os.path.abspath(options.dummy_dir), "%s.%s" % (os.path.basename(__file__), os.getpid()))
+    if not os.path.exists(dummy_dir):
+        os.makedirs(dummy_dir)
     # Create output dir #
     if not os.path.exists(os.path.abspath(options.output_dir)):
         os.makedirs(os.path.abspath(options.output_dir))
-    # Create dummy dir #
-    if not os.path.exists(dummy_dir):
-        os.makedirs(dummy_dir)
 
     #----------#
     # MMseqs2  #
     #----------#
-        
+
     # Skip if nr query db already exists #
     nr_query_db = os.path.join(os.path.abspath(options.output_dir), "query.%s.db" % options.nr_db)
     if not os.path.exists(nr_query_db):
@@ -153,7 +152,7 @@ if __name__ == "__main__":
     nr_alignment_file = os.path.join(os.path.abspath(options.output_dir), "query.%s.ali" % options.nr_db)
     if not os.path.exists(nr_alignment_file):
         # Search DB #
-        process = subprocess.check_output(["mmseqs", "search", nr_query_db, nr_db, nr_alignment_file, dummy_dir, "--threads", "32", "-s", "7.5", "--num-iterations", "4"])
+        process = subprocess.check_output(["mmseqs", "search", nr_query_db, nr_db, nr_alignment_file, dummy_dir, "--threads", options.threads, "-s", "7.5", "--max-seq-id", "1.0", "--num-iterations", "4"])
     # Skip if redundant query db already exists #
     query_db = os.path.join(os.path.abspath(options.output_dir), "query.%s.db" % options.db)
     if not os.path.exists(query_db):
@@ -163,7 +162,7 @@ if __name__ == "__main__":
     alignment_file = os.path.join(os.path.abspath(options.output_dir), "query.%s.ali" % options.db)
     if not os.path.exists(alignment_file):
         # Search DB #
-        process = subprocess.check_output(["mmseqs", "search", query_db, db, alignment_file, dummy_dir, "--max-seqs", str(options.max_sequences), "--threads", "32", "-s", "7.5", "--max-seq-id", "1.0"])
+        process = subprocess.check_output(["mmseqs", "search", query_db, db, alignment_file, dummy_dir, "--max-seqs", str(options.max_sequences), "--threads", options.threads, "-s", "7.5", "--max-seq-id", "1.0"])
     # Skip if nr sequences file already exists #
     nr_sequences_file = os.path.join(os.path.abspath(options.output_dir), "query.%s.fa" % options.nr_db)
     if not os.path.exists(nr_sequences_file):
@@ -176,12 +175,12 @@ if __name__ == "__main__":
         process = subprocess.check_output(["mmseqs", "createseqfiledb", db, alignment_file, sequences_file])
 
     #----------#
-    # ClustalO #
+    # FAMSA    #
     #----------#
 
-    # Skip if ClustalO input file already exists #
-    clustalo_in_file = os.path.join(os.path.abspath(options.output_dir), "clustalo.in.fa")
-    if not os.path.exists(clustalo_in_file):
+    # Skip if FAMSA input file already exists #
+    famsa_in_file = os.path.join(os.path.abspath(options.output_dir), "famsa.in.fa")
+    if not os.path.exists(famsa_in_file):
         # Initialize #
         sequences = {}
         # For header, sequence... #
@@ -195,76 +194,8 @@ if __name__ == "__main__":
             # Skip if sequence already exists #
             if sequence in sequences: continue
             sequences.setdefault(sequence, header)
-        # For each sequence... #
-        for sequence in sequences:
-            # Write #
-            write(clustalo_in_file, ">%s\n%s" % (sequences[sequence], sequence))
-    # Skip if ClustalO output file already exists #
-    clustalo_out_file = os.path.join(os.path.abspath(options.output_dir), "clustalo.out.fa")
-    if not os.path.exists(clustalo_out_file):
-        # Create MSA #
-        process = subprocess.check_output(["clustalo", "-i", clustalo_in_file, "-o", clustalo_out_file, "--threads", "32"])
-
-    #----------#
-    # HMMER    #
-    #----------#
-
-    # Skip if HMMalign input file already exists #
-    hmmalign_in_file = os.path.join(os.path.abspath(options.output_dir), "hmmalign.in.fa")
-    if not os.path.exists(hmmalign_in_file):
-        # Initialize #
-        msa_sequences = {}
-        sequences = {}
-        # For header, sequence... #
-        for header, sequence in parse_fasta_file(clustalo_in_file):
-            # Add sequence #
-            msa_sequences.setdefault(sequence, header)
         # For header, sequence... #
         for header, sequence in parse_fasta_file(sequences_file):
-            # Skip if enough sequences #
-            if len(msa_sequences) + len(sequences) == options.max_sequences: break
-            # Skip if sequence already exists #
-            if sequence in msa_sequences: continue
-            if sequence in sequences: continue
-            sequences.setdefault(sequence, header)
-        # For each sequence... #
-        for sequence in sequences:
-            # Write #
-            write(hmmalign_in_file, ">%s\n%s" % (sequences[sequence], sequence))
-    # Skip if HMMalign input hmm already exists #
-    hmmalign_in_hmm = os.path.join(os.path.abspath(options.output_dir), "hmmalign.in.hmm")
-    if not os.path.exists(hmmalign_in_hmm):
-        # Create HMM #
-        process = subprocess.check_output(["hmmbuild", hmmalign_in_hmm, clustalo_out_file]) 
-    # Skip if HMMER output file already exists #
-    hmmalign_out_file = os.path.join(os.path.abspath(options.output_dir), "hmmalign.out.sto")
-    if not os.path.exists(hmmalign_out_file):
-        # Create MSA #
-        process = subprocess.check_output(["hmmalign", "--mapali", clustalo_out_file, "-o", hmmalign_out_file, "--trim", hmmalign_in_hmm, hmmalign_in_file])
-    # Skip if FASTA reformatted HMMER output already exists #
-    hmmalign_out_fas = os.path.join(os.path.abspath(options.output_dir), "hmmalign.out.fas")
-    if not os.path.exists(hmmalign_out_fas):
-        # Create MSA #
-        process = subprocess.check_output([os.path.join(os.path.dirname(os.path.realpath(__file__)), "reformat.pl"), hmmalign_out_file, hmmalign_out_fas])
-
-    #----------#
-    # FAMSA    #
-    #----------#
-
-    # Skip if FAMSA input file already exists #
-    famsa_in_file = os.path.join(os.path.abspath(options.output_dir), "famsa.in.fa")
-    if not os.path.exists(famsa_in_file):
-        # Initialize #
-        sequences = {}
-        # For header, sequence... #
-        for header, sequence in parse_fasta_file(clustalo_in_file):
-            # Skip if enough sequences #
-            if len(sequences) == options.max_sequences: break
-            # Skip if sequence already exists #
-            if sequence in sequences: continue
-            sequences.setdefault(sequence, header)
-        # For header, sequence... #
-        for header, sequence in parse_fasta_file(hmmalign_in_file):
             # Skip if enough sequences #
             if len(sequences) == options.max_sequences: break
             # Skip if sequence already exists #
@@ -284,35 +215,6 @@ if __name__ == "__main__":
     # MSAs     #
     #----------#
 
-    # Skip if MSA file already exists #
-    hmmalign_msa_file = os.path.join(os.path.abspath(options.output_dir), "msa.hmmalign.fa")
-    if not os.path.exists(hmmalign_msa_file):
-        # Initialize #
-        uniq = set()
-        headers = []
-        sequences = []
-        # For header, sequence... #
-        for header, sequence in parse_fasta_file(hmmalign_out_fas, clean=False):
-            # Add to lists #
-            headers.append(header)
-            sequences.append(list(sequence))
-        # Transpose sequences #
-        sequences = zip(*sequences)
-        # For each position... #
-        for i in reversed(range(len(sequences))):
-            # If query position is a gap... #
-            if sequences[i][0] == "-": sequences.pop(i)
-        # Transpose sequences #
-        sequences = zip(*sequences)
-        # For each sequence... #
-        for i in range(len(headers)):
-            # If sequence is unique... #
-            sequence = "".join(sequences[i])
-            if sequence not in uniq:
-                # Write #
-                write(hmmalign_msa_file, ">%s\n%s" % (headers[i], sequence))
-                # Sequence is unique #
-                uniq.add(sequence)
     # Skip if MSA file already exists #
     famsa_msa_file = os.path.join(os.path.abspath(options.output_dir), "msa.famsa.fa")
     if not os.path.exists(famsa_msa_file):
