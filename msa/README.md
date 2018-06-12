@@ -24,4 +24,4 @@ Other non-mandatory options include:
 * The max. number of sequences to include in the MSA (option `-s`; by default is set to 100,000 sequences)
 * The total number of cores to be used for the MSA construction (option `-t`; by default uses 1 core)
 
-Note that: 1) the execution times of both `FAMSA` and `MMseqs2` will decrease with the number of cores used (**8 or more cores is highly recommended**); and 2) [the execution time of `FAMSA` will increase with the number of sequences](https://www.nature.com/articles/srep33964/figures/3).
+Note that: 1) the execution times of both `FAMSA` and `MMseqs2` will decrease with the number of cores used (**8 or more cores is highly recommended**); and 2) [the execution time of `FAMSA` will increase with the number of sequences to be aligned](https://www.nature.com/articles/srep33964/figures/3) (*i.e.* option `-s`).
