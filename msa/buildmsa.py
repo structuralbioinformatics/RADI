@@ -152,7 +152,7 @@ if __name__ == "__main__":
     nr_alignment_file = os.path.join(os.path.abspath(options.output_dir), "query.%s.ali" % options.nr_db)
     if not os.path.exists(nr_alignment_file):
         # Search DB #
-        process = subprocess.check_output(["mmseqs", "search", nr_query_db, nr_db, nr_alignment_file, dummy_dir, "--threads", options.threads, "-s", "7.5", "--max-seq-id", "1.0", "--num-iterations", "4"])
+        process = subprocess.check_output(["mmseqs", "search", nr_query_db, nr_db, nr_alignment_file, dummy_dir, "--threads", str(options.threads), "-s", "7.5", "--max-seq-id", "1.0", "--num-iterations", "4"])
     # Skip if redundant query db already exists #
     query_db = os.path.join(os.path.abspath(options.output_dir), "query.%s.db" % options.db)
     if not os.path.exists(query_db):
@@ -162,7 +162,7 @@ if __name__ == "__main__":
     alignment_file = os.path.join(os.path.abspath(options.output_dir), "query.%s.ali" % options.db)
     if not os.path.exists(alignment_file):
         # Search DB #
-        process = subprocess.check_output(["mmseqs", "search", query_db, db, alignment_file, dummy_dir, "--max-seqs", str(options.max_sequences), "--threads", options.threads, "-s", "7.5", "--max-seq-id", "1.0"])
+        process = subprocess.check_output(["mmseqs", "search", query_db, db, alignment_file, dummy_dir, "--max-seqs", str(options.max_sequences), "--threads", str(options.threads), "-s", "7.5", "--max-seq-id", "1.0"])
     # Skip if nr sequences file already exists #
     nr_sequences_file = os.path.join(os.path.abspath(options.output_dir), "query.%s.fa" % options.nr_db)
     if not os.path.exists(nr_sequences_file):
@@ -209,7 +209,7 @@ if __name__ == "__main__":
     famsa_out_file = os.path.join(os.path.abspath(options.output_dir), "famsa.out.fa")
     if not os.path.exists(famsa_out_file):
         # Create MSA #
-        process = subprocess.check_output(["famsa", "-t", "32", famsa_in_file, famsa_out_file])
+        process = subprocess.check_output(["famsa", "-t", str(options.threads), famsa_in_file, famsa_out_file])
 
     #----------#
     # MSAs     #
