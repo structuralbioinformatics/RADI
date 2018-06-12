@@ -5,17 +5,16 @@ Please cite: ...
 
 ## Content
 The repository is organized as follows:
-* The `msa` folder contains scripts for multiple sequence alignment construction
-* The `src` folder contains the `raDI` program
+* The ``bin`` folder (will) contains the `raDI` executable
+* The ``msa`` folder contains scripts for multiple sequence alignment construction
+* The ``src`` folder contains the `raDI` code
 
 ## Dependencies
 `RADI` requires the following dependencies:
 ...
 
 ## Installation
-`raDI` is written in `C`. To compile `raDI` type `make` from within the `./src/` folder.
-
-This will create a executable both in the source folder as well as in the ``bin`` folder called ``raDI``.
+`raDI` is written in `C` programming language. To compile the code, type `make` from within the `./src/` folder. This will create a `raDI` executable both in the `./src/` folder as well as in the `./bin/` folder called ``raDI``.
 
 ## Running
 
