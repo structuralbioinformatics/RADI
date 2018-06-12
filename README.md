@@ -11,10 +11,7 @@ The repository is organized as follows:
 
 ## Dependencies
 `RADI` requires the following dependencies:
-* [`FAMSA`](http://sun.aei.polsl.pl/REFRESH/famsa)
-* [`MMseqs2`](https://github.com/soedinglab/mmseqs2)
-* [`Python 2.7`](https://www.python.org/download/releases/2.7/)
 ...
 
-## Configuration
+## Installation
 ...
