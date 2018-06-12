@@ -14,30 +14,28 @@ The repository is organized as follows:
 ...
 
 ## Installation
-`raDI` is written in `C` programming language. To compile the code, type `make` from within the `src` folder. This will create a `raDI` executable file both in the `src` and `./bin/` folders.
+`raDI` is written in `C` programming language.
+
+To compile the code, type `make` from within the `src` folder. This will create a `raDI` executable file both in the `src` and `./bin/` folders.
 
 ## Usage
 Execution of `raDI` depends on the user being allowed to use an unlimited number of processors, a feature normally blocked in unix-based systems.
 
-This property can be re-written:
+This property can be re-written for **bash**:
 
 ```
 bash
 ulimit -s unlimited
 ```
 
-for **bash** or:
+or for **csh**:
 
 ```
 csh
 limit stacksize unlimited
 ```
 
-for **csh**.
-
-Without this, the executable will rise a ``segmentation fault``.
-
-As this parameters do not affect normal functionality of the system, we recommend to add the command to the `~/.bashrc` or `~/.cshrc` configuration file.
+Without this, the executable will rise a `segmentation fault`. As this parameters do not affect normal functionality of the system, we recommend to add the command to the `~/.bashrc` or `~/.cshrc` configuration file.
 
 Call `raDI -h` to see the options of the executable:
 
