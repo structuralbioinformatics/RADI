@@ -5,7 +5,7 @@ Please cite: ...
 
 ## Content
 The repository is organized as follows:
-* The ``bin`` folder (will) contains the `raDI` executable
+* The ``bin`` folder contains the `raDI` executable
 * The ``msa`` folder contains scripts for multiple sequence alignment construction
 * The ``src`` folder contains the `raDI` code
 
@@ -14,22 +14,23 @@ The repository is organized as follows:
 ...
 
 ## Installation
-`raDI` is written in `C` programming language. To compile the code, type `make` from within the `./src/` folder. This will create a `raDI` executable both in the `./src/` folder as well as in the `./bin/` folder called ``raDI``.
+`raDI` is written in `C` programming language. To compile the code, type `make` from within the `src` folder. This will create a `raDI` executable file both in the `src` and `./bin/` folders.
 
-## Running
+## Usage
+Execution of `raDI` depends on the user being allowed to use an unlimited number of processors, a feature normally blocked in unix-based systems.
 
-Execution of ``raDI`` depends on the user being allowed to use an unlimited number of processors, a feature normally blocked in unix-based systems.
+This property can be re-written:
 
-This property can be re-written with:
-
-```bash
+```
+bash
 ulimit -s unlimited
 ```
 
 for **bash** or:
 
-```csh
-limit  stacksize unlimited
+```
+csh
+limit stacksize unlimited
 ```
 
 for **csh**.
