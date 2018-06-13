@@ -1,8 +1,8 @@
 #include     "raDI.h"
 
 PROT  readpdb(pdb,verbose)
-FILE *pdb;      	        /* Pointer to DataBase pdb file */
-int   verbose;
+  FILE *pdb;      	        /* Pointer to DataBase pdb file */
+  int   verbose;
 {
 
 /*---------- Variables definitions ----------*/
@@ -17,7 +17,7 @@ int   verbose;
   int ic;
   int ini;
   int fin;
-  char a_name[5];		
+  char a_name[5];
   char a_res[5];
   char a_chain[5];
   char a_res_number[6];
@@ -26,25 +26,25 @@ int   verbose;
   float  a_y;
   float  a_z;
   float  a_bfact;
-  
+
   int pr_number_of_atoms;
   int pr_number_of_res;
 
 
 /*---------- Initialize structures -----------*/
 
-      for (j=0;j<MAXATOM;j++) {
-	  memset(protein.atoms_of_prot[j].name,'\0',5);
-          memset(protein.atoms_of_prot[j].res,'\0',5);
-          memset(protein.atoms_of_prot[j].res_code,'\0',2);
-          memset(protein.atoms_of_prot[j].a_res_number,'\0',6);
-	  memset(protein.atoms_of_prot[j].chain,'\0',5);
-          protein.atoms_of_prot[j].res_number = 0;
-          protein.atoms_of_prot[j].x = 0;
-	  protein.atoms_of_prot[j].y = 0;
-	  protein.atoms_of_prot[j].z = 0;
-	  protein.atoms_of_prot[j].bfact = 0;
-	  }
+  for (j=0;j<MAXATOM;j++) {
+    memset(protein.atoms_of_prot[j].name,'\0',5);
+    memset(protein.atoms_of_prot[j].res,'\0',5);
+    memset(protein.atoms_of_prot[j].res_code,'\0',2);
+    memset(protein.atoms_of_prot[j].a_res_number,'\0',6);
+    memset(protein.atoms_of_prot[j].chain,'\0',5);
+    protein.atoms_of_prot[j].res_number = 0;
+    protein.atoms_of_prot[j].x = 0;
+    protein.atoms_of_prot[j].y = 0;
+    protein.atoms_of_prot[j].z = 0;
+    protein.atoms_of_prot[j].bfact = 0;
+  }
 
 /*---------- Open files ----------*/
 /*---------- Running functions ----------*/
@@ -56,7 +56,7 @@ int   verbose;
    memset(a_res,'\0',5);
    memset(a_res_number,'\0',6);
    memset(a_chain,'\0',5);
-  if (pdb!=NULL){ 
+  if (pdb!=NULL){
     j=0;
     pr_number_of_atoms = 0;
     pr_number_of_res= 1;
@@ -125,9 +125,9 @@ int   verbose;
     }
     protein.number_of_atoms=pr_number_of_atoms;
     protein.number_of_res=pr_number_of_res;
-    if (verbose) printf("\t-- PDB: Total of Atoms=%d Total of Residues=%d\n",pr_number_of_atoms,pr_number_of_res); 
+    if (verbose) printf("\t-- PDB: Total of Atoms=%d Total of Residues=%d\n",pr_number_of_atoms,pr_number_of_res);
   }
- 
+
    return protein;
 
 }
