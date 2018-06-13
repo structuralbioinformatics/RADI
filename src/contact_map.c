@@ -14,7 +14,6 @@ int **contact_map(protein, gap, type, cutoff, d, verbose)
 
   nr = protein.number_of_res;
   if (verbose) printf("\t-- Check contacts %d X %d between %s-atom-distance < %f A\n", nr, nr, type, cutoff);
-  if (verbose) printf("\t-- For a max. possible total of Atoms=%d\n", protein.number_of_atoms);
   cmap = (int**)malloc((nr + 1) * sizeof(int*));
   for (i=0; i<=nr; i++){ cmap[i]=(int*) calloc((nr+1), sizeof(int)); }
   for (i=0; i<=nr; i++){ cmap[i][j]=0; }
@@ -28,23 +27,19 @@ int **contact_map(protein, gap, type, cutoff, d, verbose)
   ic = 0;
 
   for (i=0; i<protein.number_of_atoms; i++){
-    if (verbose) printf("%d ", protein.atoms_of_prot[i].res_number);
     if(!strcmp(protein.atoms_of_prot[i].name, "CA  ") && (!strcmp(type, "ca") || !strcmp(type, "CA")) ){
-      if (verbose) printf("\t-- It's CA\n");
       x=protein.atoms_of_prot[i].x;
       y=protein.atoms_of_prot[i].y;
       z=protein.atoms_of_prot[i].z;
     }
     if ((!strcmp(protein.atoms_of_prot[i].name, "CB  ") || (!strcmp(protein.atoms_of_prot[i].name, "CA  ") && !strcmp(protein.atoms_of_prot[i].res, "GLY")) )
      && (!strcmp(type,"cb") || !strcmp(type,"CB")) ){
-      if (verbose) printf("\t-- It's CB\n");
       x=protein.atoms_of_prot[i].x;
       y=protein.atoms_of_prot[i].y;
       z=protein.atoms_of_prot[i].z;
     }
     if (((strcmp(protein.atoms_of_prot[i].name, "C   ") && strcmp(protein.atoms_of_prot[i].name, "N   ") && strcmp(protein.atoms_of_prot[i].name, "O   ")
        && strcmp(protein.atoms_of_prot[i].name,"CA  ")) || (!strcmp(protein.atoms_of_prot[i].res,"GLY")) ) && (!strcmp(type,"min")||!strcmp(type,"MIN")) ){
-      if (verbose) printf("\t-- It's BB\n");
       x=protein.atoms_of_prot[i].x;
       y=protein.atoms_of_prot[i].y;
       z=protein.atoms_of_prot[i].z;
