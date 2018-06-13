@@ -1,0 +1,9 @@
+# Compiled files should not be included, as they are build specific
+
+src/*.o
+src/raDI
+bin/raDI
+
+# Output demo files should not be included
+
+demo/1ATG_A_with*
