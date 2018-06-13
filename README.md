@@ -23,15 +23,13 @@ Execution of `raDI` depends on the user being allowed to use an unlimited number
 
 This property can be re-written for **bash**:
 
-```
-bash
+```bash
 ulimit -s unlimited
 ```
 
 or for **csh**:
 
-```
-csh
+```csh
 limit stacksize unlimited
 ```
 

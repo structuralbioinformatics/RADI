@@ -1,19 +1,19 @@
-#include<stdio.h>
-#include<stdlib.h>
-#include<string.h>
-#include<math.h>
-#include<time.h>
-#include<ctype.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <math.h>
+#include <time.h>
+#include <ctype.h>
 
 
 // Internal parameters for execution:
 // starting maximum number of gaps per column-position 15%,
 // Limitting number of accepted gaps per column position 75%
-// maximum %ID 80% 
+// maximum %ID 80%
 // pseudo-count lamda 0.5
 // maximum number of characters of a line 131072
 // maximum number of characters of a sequence 10000
-// Minimum number of effective sequences to remove gaps Min_Meff_gaps 
+// Minimum number of effective sequences to remove gaps Min_Meff_gaps
 
 #define MAXS 	500	/* Maximum number of characters in a line of PDB */
 #define MAXATOM 100000	/* Maximum number of atoms in a protein */
