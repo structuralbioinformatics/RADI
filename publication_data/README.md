@@ -2,7 +2,7 @@
 
 This folder contains all the data necessary to reproduce the data presented in the final manuscript.
 
-## `input_SecStr.tar.gz`
+## `input_SecStr.tar.gz`
 
 This file compiles all the sequence - secondary structure assignations for each protein of the benchmark.
 
