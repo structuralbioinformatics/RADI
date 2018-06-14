@@ -16,6 +16,8 @@ To generate it, run:
 cat input_msa_splita* > input_msa.tar.gz
 ```
 
+The final compiled file contains all the **M**ultiple **S**equence **A**lignments necessary to run **raDI**.
+
 ## `*_contact_maps.tar.gz`
 
 Each one of this compressed files contains all the `.gif` outputs obtained according to the alphabet definition selected.
