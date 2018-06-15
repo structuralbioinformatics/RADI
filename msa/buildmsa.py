@@ -183,23 +183,23 @@ if __name__ == "__main__":
     if not os.path.exists(famsa_in_file):
         # Initialize #
         sequences = []
-        sequences_set = set()
+        uniq_sequences = set()
         # For header, sequence... #
         for header, sequence in parse_fasta_file(os.path.abspath(options.input_file)):
             sequences.append((header, sequence))
-            sequences_set.add(sequence)
+            uniq_sequences.add(sequence)
         # For header, sequence... #
         for header, sequence in parse_fasta_file(nr_sequences_file):
             # Skip if sequence already exists #
-            if sequence in sequences_set: continue
+            if sequence in uniq_sequences: continue
             sequences.append((header, sequence))
-            sequences_set.add(sequence)
+            uniq_sequences.add(sequence)
         # For header, sequence... #
         for header, sequence in parse_fasta_file(sequences_file):
             # Skip if sequence already exists #
-            if sequence in sequences_set: continue
+            if sequence in uniq_sequences: continue
             sequences.append((header, sequence))
-            sequences_set.add(sequence)
+            uniq_sequences.add(sequence)
         # For header, sequence... #
         for header, sequence in sequences:
             # Write #
@@ -240,7 +240,7 @@ if __name__ == "__main__":
             if len(uniq_sequences) == options.max_sequences: break
             # If sequence is unique... #
             sequence = "".join(sequences[i])
-            if sequence not in uniq:
+            if sequence not in uniq_sequences:
                 # Write #
                 write(famsa_msa_file, ">%s\n%s" % (headers[i], sequence))
                 # Sequence is unique #
