@@ -215,17 +215,26 @@ if __name__ == "__main__":
     #----------#
 
     # Skip if MSA file already exists #
-    famsa_msa_file = os.path.join(os.path.abspath(options.output_dir), "msa.famsa.fa")
+    famsa_msa_file = os.path.join(os.path.abspath(options.output_dir), "msa.fa")
     if not os.path.exists(famsa_msa_file):
         # Initialize #
+        i = 0
         headers = []
         sequences = []
         uniq_sequences = set()
+        sequences_indexes = {}
+        # For header, sequence... #
+        for header, sequence in parse_fasta_file(famsa_in_file, clean=False):
+            # Initialize #
+            sequences_indexes.setdefault(header, i)
+            headers.append([])
+            sequences.append([])
+            i += 1
         # For header, sequence... #
         for header, sequence in parse_fasta_file(famsa_out_file, clean=False):
             # Add to lists #
-            headers.append(header)
-            sequences.append(list(sequence))
+            headers[sequences_indexes[header]] = header
+            sequences[sequences_indexes[header]] = list(sequence)
         # Transpose sequences #
         sequences = zip(*sequences)
         # For each position... #
