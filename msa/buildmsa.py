@@ -162,7 +162,7 @@ if __name__ == "__main__":
     alignment_file = os.path.join(os.path.abspath(options.output_dir), "query.%s.ali" % options.db)
     if not os.path.exists(alignment_file):
         # Search DB #
-        process = subprocess.check_output(["mmseqs", "search", query_db, db, alignment_file, dummy_dir, "--max-accept   ", str(options.max_sequences), "--threads", str(options.threads), "-s", "7.5", "--max-seq-id", "1.0"])
+        process = subprocess.check_output(["mmseqs", "search", query_db, db, alignment_file, dummy_dir, "--max-accept", str(options.max_sequences), "--threads", str(options.threads), "-s", "7.5", "--max-seq-id", "1.0"])
     # Skip if nr sequences file already exists #
     nr_sequences_file = os.path.join(os.path.abspath(options.output_dir), "query.%s.fa" % options.nr_db)
     if not os.path.exists(nr_sequences_file):
