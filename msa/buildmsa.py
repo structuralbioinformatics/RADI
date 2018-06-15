@@ -147,32 +147,32 @@ if __name__ == "__main__":
     nr_query_db = os.path.join(os.path.abspath(options.output_dir), "query.%s.db" % options.nr_db)
     if not os.path.exists(nr_query_db):
         # Create DB #
-        process = subprocess.check_output(["mmseqs", "createdb", os.path.abspath(options.input_file), nr_query_db], stderr=subprocess.STDOUT)
+        process = subprocess.check_output(["mmseqs", "createdb", os.path.abspath(options.input_file), nr_query_db])
     # Skip if nr alignment file already exists #
     nr_alignment_file = os.path.join(os.path.abspath(options.output_dir), "query.%s.ali" % options.nr_db)
     if not os.path.exists(nr_alignment_file):
         # Search DB #
-        process = subprocess.check_output(["mmseqs", "search", nr_query_db, nr_db, nr_alignment_file, dummy_dir, "--threads", str(options.threads), "-s", "7.5", "--max-seq-id", "1.0", "--num-iterations", "4"], stderr=subprocess.STDOUT)
+        process = subprocess.check_output(["mmseqs", "search", nr_query_db, nr_db, nr_alignment_file, dummy_dir, "--threads", str(options.threads), "-s", "7.5", "--max-seq-id", "1.0", "--num-iterations", "4"])
     # Skip if redundant query db already exists #
     query_db = os.path.join(os.path.abspath(options.output_dir), "query.%s.db" % options.db)
     if not os.path.exists(query_db):
         # Create DB #
-        process = subprocess.check_output(["mmseqs", "result2profile", nr_query_db, nr_db, nr_alignment_file, query_db], stderr=subprocess.STDOUT)
+        process = subprocess.check_output(["mmseqs", "result2profile", nr_query_db, nr_db, nr_alignment_file, query_db])
     # Skip if alignment file already exists #
     alignment_file = os.path.join(os.path.abspath(options.output_dir), "query.%s.ali" % options.db)
     if not os.path.exists(alignment_file):
         # Search DB #
-        process = subprocess.check_output(["mmseqs", "search", query_db, db, alignment_file, dummy_dir, "--max-accept   ", str(options.max_sequences), "--threads", str(options.threads), "-s", "7.5", "--max-seq-id", "1.0"], stderr=subprocess.STDOUT)
+        process = subprocess.check_output(["mmseqs", "search", query_db, db, alignment_file, dummy_dir, "--max-accept   ", str(options.max_sequences), "--threads", str(options.threads), "-s", "7.5", "--max-seq-id", "1.0"])
     # Skip if nr sequences file already exists #
     nr_sequences_file = os.path.join(os.path.abspath(options.output_dir), "query.%s.fa" % options.nr_db)
     if not os.path.exists(nr_sequences_file):
         # Get FASTA sequences #
-        process = subprocess.check_output(["mmseqs", "createseqfiledb", nr_db, nr_alignment_file, nr_sequences_file], stderr=subprocess.STDOUT)
+        process = subprocess.check_output(["mmseqs", "createseqfiledb", nr_db, nr_alignment_file, nr_sequences_file])
     # Skip if redundant sequences file already exists #
     sequences_file = os.path.join(os.path.abspath(options.output_dir), "query.%s.fa" % options.db)
     if not os.path.exists(sequences_file):
         # Get FASTA sequences #
-        process = subprocess.check_output(["mmseqs", "createseqfiledb", db, alignment_file, sequences_file], stderr=subprocess.STDOUT)
+        process = subprocess.check_output(["mmseqs", "createseqfiledb", db, alignment_file, sequences_file])
 
     #----------#
     # FAMSA    #
