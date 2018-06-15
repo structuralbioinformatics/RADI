@@ -201,7 +201,7 @@ if __name__ == "__main__":
             sequences.append((header, sequence))
             uniq_sequences.add(sequence)
         # For header, sequence... #
-        for header, sequence in reversed(sequences):
+        for header, sequence in sequences:
             # Write #
             write(famsa_in_file, ">%s\n%s" % (header, sequence))
     # Skip if FAMSA output file already exists #
