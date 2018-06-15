@@ -9,3 +9,7 @@ bin/raDI
 # Output demo files should not be included
 
 demo/1ATG_A_with*
+
+# Unified MSA data from publication does not fit git size requirements
+
+publication_data/input_msa.tar.gz

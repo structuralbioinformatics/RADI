@@ -44,7 +44,8 @@ Call `raDI -h` to see the options of the executable:
 #          It includes the possibility to check contact-pairs using a PDB file
 #          Authors:
 #                 Bernat Anton, Mireia Besalú, Gemma de las Cuevas,
-#                 Oriol Fornes, Jaume Bonet &  Baldo Oliva
+#                 Oriol Fornes, Jaume Bonet, Narcis Fernandez-Fuentes
+#                 Baldo Oliva
 #          Structural Bioinformatics lab (GRIB)
 #          Universitat Pompeu Fabra
 #          Catalonia

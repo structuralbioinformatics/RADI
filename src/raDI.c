@@ -4,7 +4,7 @@
 #          Program for Mutual Information and Direct Information between positions of a Multiple Sequence Alignment(MSA)
 #          It includes the possibility to check contact-pairs using a PDB file
 #          Authors:
-#          Bernat Anton, Mireia Besalú, Gemma de las Cuevas, Oriol Fornes, Jaume Bonet &  Baldo Oliva
+#          Bernat Anton, Mireia Besalú, Gemma de las Cuevas, Oriol Fornes, Jaume Bonet, Narcis Fernandez-Fuentes & Baldo Oliva
 #          Structural Bioinformatics lab (GRIB)
 #          Universitat Pompeu Fabra
 #          Catalonia\n\
