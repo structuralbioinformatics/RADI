@@ -5,7 +5,7 @@ It requires the following dependencies:
 * [`FAMSA`](http://sun.aei.polsl.pl/REFRESH/famsa)
 * [`MMseqs2`](https://github.com/soedinglab/mmseqs2)
 * [`Python 2.7`](https://www.python.org/download/releases/2.7/)
-* [UniRef](https://www.uniprot.org/help/uniref)100, 90 and 50 databases
+* [UniRef100, 90 and 50](https://www.uniprot.org/help/uniref) databases
 
 ## Usage
 And the following inputs:
