@@ -151,7 +151,7 @@ if __name__ == "__main__":
     nr_alignment_file = os.path.join(os.path.abspath(options.output_dir), "query.%s.ali" % options.nr_db)
     if not os.path.exists(nr_alignment_file):
         # Search DB #
-        process = subprocess.check_output(["mmseqs", "search", nr_query_db, nr_db, nr_alignment_file, dummy_dir, "--max-seqs", str(options.max_sequences), "--threads", str(options.threads), "-s", "7.5", "--max-seq-id", "1.0", "--num-iterations", "4"])
+        process = subprocess.check_output(["mmseqs", "search", nr_query_db, nr_db, nr_alignment_file, dummy_dir, "--threads", str(options.threads), "-s", "7.5", "--max-seq-id", "1.0", "--num-iterations", "4"])
     # Skip if redundant query db already exists #
     query_db = os.path.join(os.path.abspath(options.output_dir), "query.%s.db" % options.db)
     if not os.path.exists(query_db):
@@ -162,11 +162,6 @@ if __name__ == "__main__":
     if not os.path.exists(alignment_file):
         # Search DB #
         process = subprocess.check_output(["mmseqs", "search", query_db, db, alignment_file, dummy_dir, "--max-seqs", str(options.max_sequences), "--threads", str(options.threads), "-s", "7.5", "--max-seq-id", "1.0"])
-    # Skip if nr sequences file already exists #
-    nr_sequences_file = os.path.join(os.path.abspath(options.output_dir), "query.%s.fa" % options.nr_db)
-    if not os.path.exists(nr_sequences_file):
-        # Get FASTA sequences #
-        process = subprocess.check_output(["mmseqs", "createseqfiledb", nr_db, nr_alignment_file, nr_sequences_file])
     # Skip if redundant sequences file already exists #
     sequences_file = os.path.join(os.path.abspath(options.output_dir), "query.%s.fa" % options.db)
     if not os.path.exists(sequences_file):
@@ -185,12 +180,6 @@ if __name__ == "__main__":
         uniq_sequences = set()
         # For header, sequence... #
         for header, sequence in parse_fasta_file(os.path.abspath(options.input_file)):
-            sequences.append((header, sequence))
-            uniq_sequences.add(sequence)
-        # For header, sequence... #
-        for header, sequence in parse_fasta_file(nr_sequences_file):
-            # Skip if sequence already exists #
-            if sequence in uniq_sequences: continue
             sequences.append((header, sequence))
             uniq_sequences.add(sequence)
         # For header, sequence... #
