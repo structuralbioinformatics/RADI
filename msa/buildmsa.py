@@ -35,7 +35,7 @@ def parse_options():
 
     (options, args) = parser.parse_args()
 
-    if options.input_file is None:
+    if options.famsa_dir is None or options.input_file is None or options.mmseqs_dir is None or options.uniref_dir is None:
         parser.error("missing arguments: type option \"-h\" for help")
 
     return options
@@ -71,7 +71,7 @@ def parse_fasta_file(file_name, clean=True):
 
     @input:
     file_name {string}
-    clean {boolean} if true, converts \W to X
+    clean {boolean} if true, converts non-amino acid residues to X
     @return:
     line {list} header, sequence
 
@@ -85,19 +85,18 @@ def parse_fasta_file(file_name, clean=True):
         if len(line) == 0: continue
         if line.startswith("#"): continue
         if line.startswith(">"):
-            if sequence != "":
-                if clean:
-                    sequence = re.sub("\W|\d", "X", sequence)
+            if header != "" and sequence != "":
                 yield header, sequence
-            m = re.search("^>(.+)", line)
-            header = m.group(1)
+            header = ""
             sequence = ""
-        else:
-            sequence += line.upper()
-    if clean:
-        sequence = re.sub("\W|\d", "X", sequence)
-
-    yield header, sequence
+            m = re.search("^>(.+)", line)
+            if m: header = m.group(1)
+        elif header != "":
+            sub_sequence = line.upper()
+            if clean: sub_sequence = re.sub("[^ACDEFGHIKLMNPQRSTUVWY]", "X", sub_sequence)
+            sequence += sub_sequence
+    if header != "" and sequence != "":
+        yield header, sequence
 
 def write(file_name=None, content=""):
     """
@@ -129,6 +128,8 @@ if __name__ == "__main__":
     options = parse_options()
 
     # Initialize #
+    famsa = os.path.join(os.path.abspath(options.famsa_dir), "famsa")
+    mmseqs = os.path.join(os.path.abspath(options.mmseqs_dir), "mmseqs")
     nr_db = os.path.join(os.path.abspath(options.uniref_dir), "%s.fa.db" % options.nr_db)
     db = os.path.join(os.path.abspath(options.uniref_dir), "%s.fa.db" % options.db)
     # Create dummy dir #
@@ -147,32 +148,27 @@ if __name__ == "__main__":
     nr_query_db = os.path.join(os.path.abspath(options.output_dir), "query.%s.db" % options.nr_db)
     if not os.path.exists(nr_query_db):
         # Create DB #
-        process = subprocess.check_output(["mmseqs", "createdb", os.path.abspath(options.input_file), nr_query_db])
+        process = subprocess.check_output([mmseqs, "createdb", os.path.abspath(options.input_file), nr_query_db])
     # Skip if nr alignment file already exists #
     nr_alignment_file = os.path.join(os.path.abspath(options.output_dir), "query.%s.ali" % options.nr_db)
     if not os.path.exists(nr_alignment_file):
         # Search DB #
-        process = subprocess.check_output(["mmseqs", "search", nr_query_db, nr_db, nr_alignment_file, dummy_dir, "--threads", str(options.threads), "-s", "7.5", "--max-seq-id", "1.0", "--num-iterations", "4"])
+        process = subprocess.check_output([mmseqs, "search", nr_query_db, nr_db, nr_alignment_file, dummy_dir, "--threads", str(options.threads), "-s", "7.5", "--max-seq-id", "1.0", "--num-iterations", "4"])
     # Skip if redundant query db already exists #
     query_db = os.path.join(os.path.abspath(options.output_dir), "query.%s.db" % options.db)
     if not os.path.exists(query_db):
         # Create DB #
-        process = subprocess.check_output(["mmseqs", "result2profile", nr_query_db, nr_db, nr_alignment_file, query_db])
+        process = subprocess.check_output([mmseqs, "result2profile", nr_query_db, nr_db, nr_alignment_file, query_db])
     # Skip if alignment file already exists #
     alignment_file = os.path.join(os.path.abspath(options.output_dir), "query.%s.ali" % options.db)
     if not os.path.exists(alignment_file):
         # Search DB #
-        process = subprocess.check_output(["mmseqs", "search", query_db, db, alignment_file, dummy_dir, "--max-seqs", str(options.max_sequences), "--threads", str(options.threads), "-s", "7.5", "--max-seq-id", "1.0"])
-    # Skip if nr sequences file already exists #
-    nr_sequences_file = os.path.join(os.path.abspath(options.output_dir), "query.%s.fa" % options.nr_db)
-    if not os.path.exists(nr_sequences_file):
-        # Get FASTA sequences #
-        process = subprocess.check_output(["mmseqs", "createseqfiledb", nr_db, nr_alignment_file, nr_sequences_file])
+        process = subprocess.check_output([mmseqs, "search", query_db, db, alignment_file, dummy_dir, "--max-seqs", str(options.max_sequences), "--threads", str(options.threads), "-s", "7.5", "--max-seq-id", "1.0"])
     # Skip if redundant sequences file already exists #
     sequences_file = os.path.join(os.path.abspath(options.output_dir), "query.%s.fa" % options.db)
     if not os.path.exists(sequences_file):
         # Get FASTA sequences #
-        process = subprocess.check_output(["mmseqs", "createseqfiledb", db, alignment_file, sequences_file])
+        process = subprocess.check_output([mmseqs, "createseqfiledb", db, alignment_file, sequences_file])
 
     #----------#
     # FAMSA    #
@@ -182,51 +178,53 @@ if __name__ == "__main__":
     famsa_in_file = os.path.join(os.path.abspath(options.output_dir), "famsa.in.fa")
     if not os.path.exists(famsa_in_file):
         # Initialize #
-        sequences = {}
+        sequences = []
+        uniq_sequences = set()
         # For header, sequence... #
         for header, sequence in parse_fasta_file(os.path.abspath(options.input_file)):
-            # Add sequence #
-            sequences.setdefault(sequence, header)
-        # For header, sequence... #
-        for header, sequence in parse_fasta_file(nr_sequences_file):
-            # Skip if enough sequences #
-            if len(sequences) == options.max_sequences: break
-            # Skip if sequence already exists #
-            if sequence in sequences: continue
-            sequences.setdefault(sequence, header)
+            sequences.append((header, sequence))
+            uniq_sequences.add(sequence)
         # For header, sequence... #
         for header, sequence in parse_fasta_file(sequences_file):
-            # Skip if enough sequences #
-            if len(sequences) == options.max_sequences: break
             # Skip if sequence already exists #
-            if sequence in sequences: continue
-            sequences.setdefault(sequence, header)
-        # For each sequence... #
-        for sequence in sequences:
+            if sequence in uniq_sequences: continue
+            sequences.append((header, sequence))
+            uniq_sequences.add(sequence)
+        # For header, sequence... #
+        for header, sequence in sequences:
             # Write #
-            write(famsa_in_file, ">%s\n%s" % (sequences[sequence], sequence))
+            write(famsa_in_file, ">%s\n%s" % (header, sequence))
     # Skip if FAMSA output file already exists #
     famsa_out_file = os.path.join(os.path.abspath(options.output_dir), "famsa.out.fa")
     if not os.path.exists(famsa_out_file):
         # Create MSA #
-        process = subprocess.check_output(["famsa", "-t", str(options.threads), famsa_in_file, famsa_out_file])
+        process = subprocess.check_output([famsa, "-t", str(options.threads), famsa_in_file, famsa_out_file], stderr=subprocess.STDOUT)
 
     #----------#
     # MSAs     #
     #----------#
 
     # Skip if MSA file already exists #
-    famsa_msa_file = os.path.join(os.path.abspath(options.output_dir), "msa.famsa.fa")
+    famsa_msa_file = os.path.join(os.path.abspath(options.output_dir), "msa.fa")
     if not os.path.exists(famsa_msa_file):
         # Initialize #
-        uniq = set()
+        i = 0
         headers = []
         sequences = []
+        uniq_sequences = set()
+        sequences_indexes = {}
+        # For header, sequence... #
+        for header, sequence in parse_fasta_file(famsa_in_file, clean=False):
+            # Initialize #
+            sequences_indexes.setdefault(header, i)
+            headers.append([])
+            sequences.append([])
+            i += 1
         # For header, sequence... #
         for header, sequence in parse_fasta_file(famsa_out_file, clean=False):
             # Add to lists #
-            headers.append(header)
-            sequences.append(list(sequence))
+            headers[sequences_indexes[header]] = header
+            sequences[sequences_indexes[header]] = list(sequence)
         # Transpose sequences #
         sequences = zip(*sequences)
         # For each position... #
@@ -237,10 +235,12 @@ if __name__ == "__main__":
         sequences = zip(*sequences)
         # For each sequence... #
         for i in range(len(headers)):
+            # Skip if enough sequences #
+            if len(uniq_sequences) == options.max_sequences: break
             # If sequence is unique... #
             sequence = "".join(sequences[i])
-            if sequence not in uniq:
+            if sequence not in uniq_sequences:
                 # Write #
                 write(famsa_msa_file, ">%s\n%s" % (headers[i], sequence))
                 # Sequence is unique #
-                uniq.add(sequence)
+                uniq_sequences.add(sequence)
