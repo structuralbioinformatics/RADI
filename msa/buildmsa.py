@@ -188,6 +188,8 @@ if __name__ == "__main__":
         for header, sequence in parse_fasta_file(sequences_file):
             # Skip if sequence already exists #
             if sequence in uniq_sequences: continue
+            # Break if enough sequences #
+            if len(uniq_sequences) == options.max_sequences: break
             sequences.append((header, sequence))
             uniq_sequences.add(sequence)
         # For header, sequence... #
