@@ -225,7 +225,8 @@ void Results_MI_DI(PDB_File, DI_filename, cmap_filename, cmap_off_filename, MI_t
     fprintf(DI_File, "\tCA-Distance MI\t    Nearest MI\tCA-Distance DI\t    Nearest DI");
     fprintf(DI_File, "\tCB-Distance MI\t    Nearest MI\tCB-Distance DI\t    Nearest DI");
     fprintf(DI_File, "\tMINDistance MI\t    Nearest MI\tMINDistance DI\t    Nearest DI");
-    fprintf(DI_File, "\tSuccess MI\tSuccess DI\n");
+    if (seqpos){fprintf(DI_File, "\tSuccess MI\tSuccess DI\t Xray X MI\t Xray Y MI\t Xray X DI\t Xray Y DI\n");} 
+    else       {fprintf(DI_File, "\tSuccess MI\tSuccess DI\n");}
   }else{
     fprintf(DI_File, "\n");
   }
@@ -268,9 +269,27 @@ void Results_MI_DI(PDB_File, DI_filename, cmap_filename, cmap_off_filename, MI_t
       if (NearestContact(xpos[pos[i_di]], xpos[pos[j_di]], fragment_size, L, contact_ca) < (double)THRESHOLD_CA
         || NearestContact(xpos[pos[i_di]], xpos[pos[j_di]], fragment_size, L, contact_cb) < (double)THRESHOLD_CB
         || NearestContact(xpos[pos[i_di]], xpos[pos[j_di]], fragment_size, L, contact_min) < (double)THRESHOLD_MIN){
-        fprintf(DI_File, "\t%10s\n", "yes");
+        if (seqpos==0){fprintf(DI_File, "\t%10s\n", "yes");}else{fprintf(DI_File, "\t%10s", "yes");}
       }else{
-        fprintf(DI_File, "\t%10s\n", "no");
+        if (seqpos==0){fprintf(DI_File, "\t%10s\n", "no"); }else{fprintf(DI_File, "\t%10s", "no");}
+      }
+      if (seqpos){
+       if (NearestContact(xpos[pos[i_mi]], xpos[pos[j_mi]], fragment_size, L, contact_ca) < (double)THRESHOLD_CA
+        || NearestContact(xpos[pos[i_mi]], xpos[pos[j_mi]], fragment_size, L, contact_cb) < (double)THRESHOLD_CB
+        || NearestContact(xpos[pos[i_mi]], xpos[pos[j_mi]], fragment_size, L, contact_min) < (double)THRESHOLD_MIN){
+        fprintf(DI_File, "\t%10d\t%10d",xpos[pos[i_mi]],xpos[pos[j_mi]]);
+       }else{
+        if (xpos[pos[i_mi]]==0){fprintf(DI_File, "\t%10s","-");}else{fprintf(DI_File, "\t%10d",xpos[pos[i_mi]]);}
+        if (xpos[pos[j_mi]]==0){fprintf(DI_File, "\t%10s","-");}else{fprintf(DI_File, "\t%10d",xpos[pos[j_mi]]);}
+       }
+       if (NearestContact(xpos[pos[i_di]], xpos[pos[j_di]], fragment_size, L, contact_ca) < (double)THRESHOLD_CA
+        || NearestContact(xpos[pos[i_di]], xpos[pos[j_di]], fragment_size, L, contact_cb) < (double)THRESHOLD_CB
+        || NearestContact(xpos[pos[i_di]], xpos[pos[j_di]], fragment_size, L, contact_min) < (double)THRESHOLD_MIN){
+        fprintf(DI_File, "\t%10d\t%10d\n",xpos[pos[i_di]],xpos[pos[j_di]]);
+       }else{
+        if (xpos[pos[i_di]]==0){fprintf(DI_File, "\t%10s","-");}else{fprintf(DI_File, "\t%10d",xpos[pos[i_di]]);}
+        if (xpos[pos[j_di]]==0){fprintf(DI_File, "\t%10s\n","-");}else{fprintf(DI_File, "\t%10d\n",xpos[pos[j_di]]);}
+       }
       }
     }else{
       fprintf(DI_File, "\n");
