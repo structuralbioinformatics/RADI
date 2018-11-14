@@ -19,10 +19,10 @@ fragment_size = interval of residues for accepting correct contacts (9 by defaul
 
 void Results_MI_DI(PDB_File, DI_filename, cmap_filename, cmap_off_filename, MI_top_filename, DI_top_filename,
                    gnu_filename, gnu_gif, cmap_ca, contact_ca, cmap_cb, contact_cb, cmap_min, contact_min, nr,
-                   l, L, minimum_gap, numseqs, fragment_size, Meff, pos, xpos, SSA, MI, DI, time, verbose)
+                   l, L, minimum_gap, numseqs, fragment_size, Meff, pos, xpos, SSA, MI, DI, time, verbose,seqpos)
   FILE *PDB_File;
   secondary_structure *SSA;
-  int nr, l, L, numseqs, verbose, minimum_gap, fragment_size, *xpos, *pos;
+  int nr, l, L, numseqs, verbose, seqpos,minimum_gap, fragment_size, *xpos, *pos;
   int **cmap_ca, **cmap_cb, **cmap_min;
   double **DI, **MI, **contact_ca, **contact_cb, **contact_min, *time, Meff;
   char *gnu_gif, *cmap_filename, *cmap_off_filename, *MI_top_filename, *DI_top_filename, *DI_filename, *gnu_filename;
@@ -237,74 +237,41 @@ void Results_MI_DI(PDB_File, DI_filename, cmap_filename, cmap_off_filename, MI_t
     i_di     = i_index[index_di];
     j_di     = j_index[index_di];
     if (rank < max_rank_di && rank < max_rank_mi){
-      fprintf(DI_File, "%10d\t%8d\t%8d\t%8.6f\t%8d\t%8d\t%8.6f",rank, xpos[pos[i_mi]], xpos[pos[j_mi]], MI_order[mi_rank[rank]], xpos[pos[i_di]], xpos[pos[j_di]], DI_order[di_rank[rank]]);
+      if (seqpos){fprintf(DI_File, "%10d\t%8d\t%8d\t%8.6f\t%8d\t%8d\t%8.6f",rank, pos[i_mi], pos[j_mi], MI_order[mi_rank[rank]], pos[i_di], pos[j_di], DI_order[di_rank[rank]]);}
+      else       {fprintf(DI_File, "%10d\t%8d\t%8d\t%8.6f\t%8d\t%8d\t%8.6f",rank, xpos[pos[i_mi]], xpos[pos[j_mi]], MI_order[mi_rank[rank]], xpos[pos[i_di]], xpos[pos[j_di]], DI_order[di_rank[rank]]);}
     }else if (rank < max_rank_di){
-      fprintf(DI_File, "%10d\t%8s\t%8s\t%8s\t%8d\t%8d\t%8.6f",rank, "-", "-", "-", xpos[pos[i_di]], xpos[pos[j_di]], DI_order[di_rank[rank]]);
+      if (seqpos){fprintf(DI_File, "%10d\t%8s\t%8s\t%8s\t%8d\t%8d\t%8.6f",rank, "-", "-", "-", pos[i_di], pos[j_di], DI_order[di_rank[rank]]);}
+      else       {fprintf(DI_File, "%10d\t%8s\t%8s\t%8s\t%8d\t%8d\t%8.6f",rank, "-", "-", "-", xpos[pos[i_di]], xpos[pos[j_di]], DI_order[di_rank[rank]]);}
     }else if (rank < max_rank_mi){
-      fprintf(DI_File, "%10d\t%8d\t%8d\t%8.6f\t%8s\t%8s\t%8s", rank, xpos[pos[i_mi]], xpos[pos[j_mi]], MI_order[mi_rank[rank]], "-", "-", "-");
+      if (seqpos){fprintf(DI_File, "%10d\t%8d\t%8d\t%8.6f\t%8s\t%8s\t%8s", rank, pos[i_mi], pos[j_mi], MI_order[mi_rank[rank]], "-", "-", "-");}
+      else       {fprintf(DI_File, "%10d\t%8d\t%8d\t%8.6f\t%8s\t%8s\t%8s", rank, xpos[pos[i_mi]], xpos[pos[j_mi]], MI_order[mi_rank[rank]], "-", "-", "-");}
     }else{
        break;
     }
     if (PDB_File!=NULL) {
-     if (rank < max_rank_di && rank < max_rank_mi){
       fprintf(DI_File, "\t%14.3f\t%14.3f\t%14.3f\t%14.3f", contact_ca[xpos[pos[i_mi]]][xpos[pos[j_mi]]],
               NearestContact(xpos[pos[i_mi]], xpos[pos[j_mi]], fragment_size, L, contact_ca), contact_ca[xpos[pos[i_di]]][xpos[pos[j_di]]],
               NearestContact(xpos[pos[i_di]], xpos[pos[j_di]], fragment_size, L, contact_ca));
-     }else if (rank < max_rank_di){
-      fprintf(DI_File, "\t%14s\t%14s\t%14.3f\t%14.3f", "-",
-              "-", contact_ca[xpos[pos[i_di]]][xpos[pos[j_di]]],
-              NearestContact(xpos[pos[i_di]], xpos[pos[j_di]], fragment_size, L, contact_ca));
-     }else if (rank < max_rank_mi){
-      fprintf(DI_File, "\t%14.3f\t%14.3f\t%14s\t%14s", contact_ca[xpos[pos[i_mi]]][xpos[pos[j_mi]]],
-              NearestContact(xpos[pos[i_mi]], xpos[pos[j_mi]], fragment_size, L, contact_ca), "-",
-              "-");
-     }else{
-      fprintf(DI_File, "\t%14s\t%14s\t%14s\t%14s", "-","-","-","-");
-     }
-     if (rank < max_rank_di && rank < max_rank_mi){
       fprintf(DI_File, "\t%14.3f\t%14.3f\t%14.3f\t%14.3f", contact_cb[xpos[pos[i_mi]]][xpos[pos[j_mi]]],
               NearestContact(xpos[pos[i_mi]], xpos[pos[j_mi]], fragment_size, L, contact_cb), contact_cb[xpos[pos[i_di]]][xpos[pos[j_di]]],
               NearestContact(xpos[pos[i_di]], xpos[pos[j_di]], fragment_size, L, contact_cb));
-     }else if (rank < max_rank_di){
-      fprintf(DI_File, "\t%14s\t%14s\t%14.3f\t%14.3f", "-",
-              "-", contact_cb[xpos[pos[i_di]]][xpos[pos[j_di]]],
-              NearestContact(xpos[pos[i_di]], xpos[pos[j_di]], fragment_size, L, contact_cb));
-     }else if (rank < max_rank_mi){
-      fprintf(DI_File, "\t%14.3f\t%14.3f\t%14s\t%14s", contact_cb[xpos[pos[i_mi]]][xpos[pos[j_mi]]],
-              NearestContact(xpos[pos[i_mi]], xpos[pos[j_mi]], fragment_size, L, contact_cb), "-",
-              "-");
-     }else{
-      fprintf(DI_File, "\t%14s\t%14s\t%14s\t%14s", "-","-","-","-");
-     }
-     if (rank < max_rank_di && rank < max_rank_mi){
       fprintf(DI_File, "\t%14.3f\t%14.3f\t%14.3f\t%14.3f", contact_min[xpos[pos[i_mi]]][xpos[pos[j_mi]]],
               NearestContact(xpos[pos[i_mi]], xpos[pos[j_mi]], fragment_size, L, contact_min), contact_min[xpos[pos[i_di]]][xpos[pos[j_di]]],
               NearestContact(xpos[pos[i_di]], xpos[pos[j_di]], fragment_size, L, contact_min));
-     }else if (rank < max_rank_di){
-      fprintf(DI_File, "\t%14s\t%14s\t%14.3f\t%14.3f", "-",
-              "-", contact_min[xpos[pos[i_di]]][xpos[pos[j_di]]],
-              NearestContact(xpos[pos[i_di]], xpos[pos[j_di]], fragment_size, L, contact_min));
-     }else if (rank < max_rank_mi){
-      fprintf(DI_File, "\t%14.3f\t%14.3f\t%14s\t%14s", contact_min[xpos[pos[i_mi]]][xpos[pos[j_mi]]],
-              NearestContact(xpos[pos[i_mi]], xpos[pos[j_mi]], fragment_size, L, contact_min), "-",
-              "-");
-     }else{
-      fprintf(DI_File, "\t%14s\t%14s\t%14s\t%14s", "-","-","-","-");
-     }
-     if (NearestContact(xpos[pos[i_mi]], xpos[pos[j_mi]], fragment_size, L, contact_ca) < (double)THRESHOLD_CA
+      if (NearestContact(xpos[pos[i_mi]], xpos[pos[j_mi]], fragment_size, L, contact_ca) < (double)THRESHOLD_CA
         || NearestContact(xpos[pos[i_mi]], xpos[pos[j_mi]], fragment_size, L, contact_cb) < (double)THRESHOLD_CB
         || NearestContact(xpos[pos[i_mi]], xpos[pos[j_mi]], fragment_size, L, contact_min) < (double)THRESHOLD_MIN){
-        if (rank < max_rank_mi){fprintf(DI_File, "\t%10s","yes");}else{fprintf(DI_File, "\t%10s","-");}
-     }else{
-        if (rank < max_rank_mi){fprintf(DI_File, "\t%10s","no");}else{fprintf(DI_File, "\t%10s","-");}
-     }
-     if (NearestContact(xpos[pos[i_di]], xpos[pos[j_di]], fragment_size, L, contact_ca) < (double)THRESHOLD_CA
+        fprintf(DI_File, "\t%10s","yes");
+      }else{
+        fprintf(DI_File, "\t%10s","no");
+      }
+      if (NearestContact(xpos[pos[i_di]], xpos[pos[j_di]], fragment_size, L, contact_ca) < (double)THRESHOLD_CA
         || NearestContact(xpos[pos[i_di]], xpos[pos[j_di]], fragment_size, L, contact_cb) < (double)THRESHOLD_CB
         || NearestContact(xpos[pos[i_di]], xpos[pos[j_di]], fragment_size, L, contact_min) < (double)THRESHOLD_MIN){
-         if (rank < max_rank_di){fprintf(DI_File, "\t%10s\n", "yes");}else{fprintf(DI_File, "\t%10s","-");}
-     }else{
-         if (rank < max_rank_di){fprintf(DI_File, "\t%10s\n", "no");}else{fprintf(DI_File, "\t%10s","-");}
-     }
+        fprintf(DI_File, "\t%10s\n", "yes");
+      }else{
+        fprintf(DI_File, "\t%10s\n", "no");
+      }
     }else{
       fprintf(DI_File, "\n");
     }

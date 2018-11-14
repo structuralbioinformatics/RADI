@@ -85,5 +85,5 @@ int RankOrder(int, int, int, int, int*, double**, secondary_structure*, int*, in
 double NearestContact(int,int,int,int,double**);
 char **GetSeedSequence(FILE*,int);
 double Calculate_MI_DI(char**, char*, char*, int, int, int, int, int*, double**, double**, double*, int);
-void Results_MI_DI( FILE*,char*,char*,char*,char*,char*,char*,char*,int**,double**,int**,double**,int**,double**,int, int, int, int, int, int , double, int*,int*, secondary_structure*, double**, double**, double*, int);
+void Results_MI_DI( FILE*,char*,char*,char*,char*,char*,char*,char*,int**,double**,int**,double**,int**,double**,int, int, int, int, int, int , double, int*,int*, secondary_structure*, double**, double**, double*, int,int);
 void MakeFileNames(char*,int,char*,char*,char*,char*,char*,char*,char*);

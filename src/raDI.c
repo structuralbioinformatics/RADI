@@ -24,7 +24,7 @@ fragment_size = interval of residues for accepting correct contacts (9 by defaul
 int main(int argc, char *argv[])
 {
 
-  int i, j, k, A, L, l,  q, numseqs, ra_cluster, help, verbose,swap;
+  int i, j, k, A, L, l,  q, numseqs, ra_cluster, help, verbose,swap,seqpos;
   int minimum_gap, fragment_size, nr;
   int *pos, *xpos;
   int *UseColumns(), *AssignNumberInStructure();
@@ -44,6 +44,7 @@ int main(int argc, char *argv[])
   ra_cluster    = 0;
   verbose       = 0;
   swap          = 0;
+  seqpos        = 0;
   minimum_gap   = 10;
   fragment_size = 9;
   SSA_File      = NULL;
@@ -59,6 +60,10 @@ int main(int argc, char *argv[])
     if (strcmp(argv[i], "-v") == 0)   {                    // verbose to print log file
       verbose=1;
       printf("#INPUT -v: \tVerbosity is ON\n");
+    }
+    if (strcmp(argv[i], "-seqp") == 0)   {                    // verbose to print log file
+      seqpos=1;
+      printf("#INPUT -seqp: \tPositions are numbered by sequence\n");
     }
     if (strcmp(argv[i], "-sdis") == 0) {	                // Minimum distance between residues
       sscanf(argv[i+1], "%d", &minimum_gap);
@@ -145,6 +150,7 @@ int main(int argc, char *argv[])
            \n\t      \t\t    3 {-}{RKHDESTNQCG}{AVLIMFWYP} \
            \n\t -o   \t\t Root name of the outputs with MI, DI and Contact-Map data for GNU plot.\
            \n\t -swap\t\t Swap the AA (or raAA) without affecting gaps \
+           \n\t -seqp\t\t Number the positions as in the sequence      \
            \n\t -v   \t\t Verbose \
            \n\t -h   \t\t This help (if MSA file is null help is also shown)\n\n");
     exit(0);
@@ -328,7 +334,7 @@ int main(int argc, char *argv[])
     if (verbose) printf("-- Rank and plot MI and DI \n");
     Results_MI_DI(PDB_File, DI_filename, cmap_filename, cmap_off_filename, MI_top_filename, DI_top_filename, gnu_filename,
                   gnu_gif, cmap_ca, contact_ca, cmap_cb, contact_cb, cmap_min, contact_min, nr, l, L, minimum_gap, numseqs,
-                  fragment_size, Meff, pos, xpos, SSA, MI, DI, time, verbose);
+                  fragment_size, Meff, pos, xpos, SSA, MI, DI, time, verbose,seqpos);
   }else{
     printf("-- Not enough effective sequences to calculate MI\n");
   }
