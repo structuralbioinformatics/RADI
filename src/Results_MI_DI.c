@@ -238,13 +238,13 @@ void Results_MI_DI(PDB_File, DI_filename, cmap_filename, cmap_off_filename, MI_t
     i_di     = i_index[index_di];
     j_di     = j_index[index_di];
     if (rank < max_rank_di && rank < max_rank_mi){
-      if (seqpos){fprintf(DI_File, "%10d\t%8d\t%8d\t%8.6f\t%8d\t%8d\t%8.6f",rank, pos[i_mi], pos[j_mi], MI_order[mi_rank[rank]], pos[i_di], pos[j_di], DI_order[di_rank[rank]]);}
+      if (seqpos){fprintf(DI_File, "%10d\t%8d\t%8d\t%8.6f\t%8d\t%8d\t%8.6f",rank, 1+pos[i_mi], 1+pos[j_mi], MI_order[mi_rank[rank]], 1+pos[i_di], 1+pos[j_di], DI_order[di_rank[rank]]);}
       else       {fprintf(DI_File, "%10d\t%8d\t%8d\t%8.6f\t%8d\t%8d\t%8.6f",rank, xpos[pos[i_mi]], xpos[pos[j_mi]], MI_order[mi_rank[rank]], xpos[pos[i_di]], xpos[pos[j_di]], DI_order[di_rank[rank]]);}
     }else if (rank < max_rank_di){
-      if (seqpos){fprintf(DI_File, "%10d\t%8s\t%8s\t%8s\t%8d\t%8d\t%8.6f",rank, "-", "-", "-", pos[i_di], pos[j_di], DI_order[di_rank[rank]]);}
+      if (seqpos){fprintf(DI_File, "%10d\t%8s\t%8s\t%8s\t%8d\t%8d\t%8.6f",rank, "-", "-", "-", 1+pos[i_di], 1+pos[j_di], DI_order[di_rank[rank]]);}
       else       {fprintf(DI_File, "%10d\t%8s\t%8s\t%8s\t%8d\t%8d\t%8.6f",rank, "-", "-", "-", xpos[pos[i_di]], xpos[pos[j_di]], DI_order[di_rank[rank]]);}
     }else if (rank < max_rank_mi){
-      if (seqpos){fprintf(DI_File, "%10d\t%8d\t%8d\t%8.6f\t%8s\t%8s\t%8s", rank, pos[i_mi], pos[j_mi], MI_order[mi_rank[rank]], "-", "-", "-");}
+      if (seqpos){fprintf(DI_File, "%10d\t%8d\t%8d\t%8.6f\t%8s\t%8s\t%8s", rank, 1+pos[i_mi], 1+pos[j_mi], MI_order[mi_rank[rank]], "-", "-", "-");}
       else       {fprintf(DI_File, "%10d\t%8d\t%8d\t%8.6f\t%8s\t%8s\t%8s", rank, xpos[pos[i_mi]], xpos[pos[j_mi]], MI_order[mi_rank[rank]], "-", "-", "-");}
     }else{
        break;
