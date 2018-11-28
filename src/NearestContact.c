@@ -14,11 +14,15 @@ double **d;
   m_maxim = (int)fmin(L,m+length/2);
 
   start=1;
+  x=100.0;
+  if (n==0 || m==0) {return x;}
   for (i=n_minim;i<=n_maxim;i++){
   for (j=m_minim;j<=m_maxim;j++){
-   if (start) {x=d[i][j];start=0;}
-   x=fmin(x,d[i][j]);
+   if (start && d[i][j]>0) {x=d[i][j];start=0;}
+   if (d[i][j]>0) {x=fmin(x,d[i][j]);}
   }}
 
   return x;
 }
+
+

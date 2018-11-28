@@ -339,8 +339,12 @@ int main(int argc, char *argv[])
     printf("-- Not enough effective sequences to calculate MI\n");
   }
 
+  //Exit without cleaning memory, remove next two lines in case memory needs to be clean
+  printf("Done\n");
+  exit(0);
 
-  //Free memory
+
+  //Free memory 
   if (verbose) printf("Clean Memory %d\n",nr);
   for (i=0; i<=nr; i++){
     free(cmap_ca[i]);
@@ -378,7 +382,7 @@ int main(int argc, char *argv[])
   free(MSA);
   free(seed_sequence);
 
-  //Exit
+  //Exit 
   printf("Done\n");
   exit(0);
 
