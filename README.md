@@ -33,7 +33,12 @@ or for **csh**:
 limit stacksize unlimited
 ```
 
-Without this, the executable will rise a `segmentation fault`. As this parameters do not affect normal functionality of the system, we recommend to add the command to the `~/.bashrc` or `~/.cshrc` configuration file.
+or for **MacOS**:
+```MacOS
+ulimit -s 65532
+```
+
+Without this, the executable will rise a `segmentation fault`. As this parameters do not affect normal functionality of the system, we recommend to add the command to the `~/.bashrc` or `~/.cshrc` configuration file. 
 
 Call `raDI -h` to see the options of the executable:
 
