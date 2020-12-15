@@ -50,3 +50,11 @@ The final compiled file contains all the **M**ultiple **S**equence **A**lignment
 
 Supplementary files of contact maps, outputs of RADI with alphabets RA0, RA1, RA2 and RA3, alignments with sMotif templates, template structures and models of a benchmark with 50 folds, distributed in folders per fold (under PDB code)
 1N9L, 1H98, 1FR3, 1LSS, 1C02, 153L, 1LJ9, 1FCA, 1KU7, 1EZM, 1ATG, 1IG1, 1ID0, 1LUC, 1LR0, 1IR6, 1OR7, 1I52, 1GDT, 1D4A, 1FP6, 1QSA, 1K38, 1HW1, 2A0B, 1DI6, 1I8O, 1K20, 1G8K, 1M6K, 1F1U, 1J5Y, 1BOO, 1G72, 1KQ3, 1PJR, 1EK9, 1D5Y, 1M7J, 1G6O, 1IXC, 1MOQ, 1DD9,1GG4, 7REQ, 1G60, 1FEP, 1B7E, 1A0P, 1QKS
+
+## S8 CCMPred results in the benchmark
+
+**filename:** `CCMPred_1.zip` and `CCMPred_2.zip`
+
+Supplementary files of contact maps and outputs of CCMPred of a benchmark with 50 folds, distributed in folders per fold (under PDB code)
+1N9L, 1H98, 1FR3, 1LSS, 1C02, 153L, 1LJ9, 1FCA, 1KU7, 1EZM, 1ATG, 1IG1, 1ID0, 1LUC, 1LR0, 1IR6, 1OR7, 1I52, 1GDT, 1D4A, 1FP6, 1QSA, 1K38, 1HW1, 2A0B, 1DI6, 1I8O, 1K20, 1G8K, 1M6K, 1F1U, 1J5Y, 1BOO, 1G72, 1KQ3, 1PJR, 1EK9, 1D5Y, 1M7J, 1G6O, 1IXC, 1MOQ, 1DD9,1GG4, 7REQ, 1G60, 1FEP, 1B7E, 1A0P, 1QKS
+
