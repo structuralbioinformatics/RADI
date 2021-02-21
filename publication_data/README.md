@@ -65,26 +65,40 @@ Given a multiple sequence alignment in FastA format, for example 1TGA_A.msa, and
 The script is:
 
 \# Path of CCMpred executable
+
 path=”/usr/local/shared/ccmpred”
 
 \# Data files
+
 target=”1TGA_A.msa”
+
 outputali=”1TGA_A.ali”
+
 outputmat=”1ATG_A.mat”
+
 output=”1ATG_A.top”
 
+
 \# Change the format of the alignment
+
 align = "python “+path+”/scripts/convert_alignment.py "+target+" fasta "+outputali
+
 os.system(align)
 
 \# CCMPred execution and time evaluation
+
 start_time = time.time()
+
 execute = path+“/bin/ccmpred "+outputali+" " +outputmat
+
 os.system(execute)
+
 print("Done for " + target + " in --- %s seconds ---" % (time.time() - start_time))
 
 \# Selection of top pairs
+
 select= "python “+path+”/scripts/top_couplings.py " + outputmat + “ > ”+output
+
 os.system(select)
 
 
