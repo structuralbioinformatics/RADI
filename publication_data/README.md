@@ -108,5 +108,10 @@ os.system(select)
 
 Legend to Supplementary Table S1. Comparison of all models with the crystallographic structures. Sub-Table “Data” compares the quality of the models and the number of effective sequences in the MSA (“size MSA”). Columns show the data as in Table 2, using restraints derived with all alphabets (RA0, RA1, RA2 and RA3), for different measures of quality (TM-scores, RMSD and Z-score of Prosa2003), the number of effective sequences in the MSA, the length of the sequence, the coverage by sMotifs and the number of sequences in the original MSA. The last columns have included the CPU time, in seconds, that each approach has taken. Sub-Table “Number of sequences in MSA” compares the total of effective sequences in the MSA of each target with the original alignment obtained with the sequences of all potential homologs found with MMSeq2. Sub-Table “Graphs” analyzes the correlations of selected datasets of the quality of the models.
 
+## S11 Table S2
+
+**filename:** `Table_S2.xlsx`
+
+Legend to Supplementary Table S2. Details of contact predictions for 50 different folds. The first column shows the PDB and chain codes of the structures analyzed. The second column (“EXPERIMENTAL”) shows the total number contacts detected on the crystallographic structure. The next columns show the number true-positive (TP), ratio of true-positive (TPR), coverage (COV) and number of false (FP) predicted contacts of the methods: CCMpred and RADI with alphabets RA0, RA1, RA2 and RA3. At the bottom are calculated the averages and standard deviations of the columns.
 
 
